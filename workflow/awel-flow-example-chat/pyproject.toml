@@ -1,0 +1,13 @@
+[tool.poetry]
+name = "awel-flow-example-chat"
+version = "0.1.0"
+description = "A simple chat flow example."
+authors = ["Fangyin Cheng <staneyffer@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
