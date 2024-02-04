@@ -17,7 +17,7 @@ pip install poetry
 ### Install current package
 
 ```bash
-dbgpt app install awel-flow-example-chat
+dbgpt app install awel-flow-simple-streaming-chat
 ```
 
 ### Restart DB-GPT
@@ -27,5 +27,5 @@ Restart DB-GPT to see the new chat flow in the web page.
 ### Uninstallation
 
 ```bash
-dbgpt app uninstall awel-flow-example-chat
+dbgpt app uninstall awel-flow-simple-streaming-chat
 ```
