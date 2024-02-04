@@ -1,0 +1,15 @@
+[flow]
+label = "Simple Streaming Chat"
+# A unique name for all dbgpts
+name = "awel_flow_simple_streaming_chat"
+version = "0.1.0"
+description = "This is an AWEL flow with multi-turn dialogue compatible with OpenAI streaming output."
+authors = ["Fangyin Cheng <staneyffer@gmail.com>"]
+# How to define the flow, python or json
+definition_type = "json"
+
+[python_config]
+
+# Json config
+[json_config]
+file_path = "definition/flow_definition.json"
