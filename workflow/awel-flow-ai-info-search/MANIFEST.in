@@ -1,0 +1,2 @@
+include dbgpts.toml
+include awel_flow_example_chat/definition/*.json
