@@ -5,8 +5,8 @@
       "height": 227,
       "id": "operator_merged_request_builder_operator___$$___common___$$___v1_0",
       "position": {
-        "x": 1043.5203246839133,
-        "y": -134.16960323883018,
+        "x": 1192.135445686209,
+        "y": -26.368187108806772,
         "zoom": 0.0
       },
       "type": "customNode",
@@ -54,8 +54,8 @@
         "version": "v1"
       },
       "position_absolute": {
-        "x": 1043.5203246839133,
-        "y": -134.16960323883018,
+        "x": 1192.135445686209,
+        "y": -26.368187108806772,
         "zoom": 0.0
       }
     },
@@ -64,8 +64,8 @@
       "height": 287,
       "id": "operator_request_builder_operator___$$___common___$$___v1_0",
       "position": {
-        "x": 387.90284879647857,
-        "y": -139.5767192151479,
+        "x": 177.1799160320296,
+        "y": -146.23112761823575,
         "zoom": 0.0
       },
       "type": "customNode",
@@ -122,8 +122,8 @@
         "version": "v1"
       },
       "position_absolute": {
-        "x": 387.90284879647857,
-        "y": -139.5767192151479,
+        "x": 177.1799160320296,
+        "y": -146.23112761823575,
         "zoom": 0.0
       }
     },
@@ -132,8 +132,8 @@
       "height": 404,
       "id": "operator_history_prompt_builder_operator___$$___conversion___$$___v1_0",
       "position": {
-        "x": 1134.1476011087223,
-        "y": 478.52048302862363,
+        "x": 844.6808355744001,
+        "y": 484.0658233645301,
         "zoom": 0.0
       },
       "type": "customNode",
@@ -230,8 +230,8 @@
         "version": "v1"
       },
       "position_absolute": {
-        "x": 1134.1476011087223,
-        "y": 478.52048302862363,
+        "x": 844.6808355744001,
+        "y": 484.0658233645301,
         "zoom": 0.0
       }
     },
@@ -240,8 +240,8 @@
       "height": 295,
       "id": "operator_chat_history_load_operator___$$___conversion___$$___v1_0",
       "position": {
-        "x": 718.1611133820337,
-        "y": 249.85079770730977,
+        "x": 510.7653848191285,
+        "y": 168.88882880307412,
         "zoom": 0.0
       },
       "type": "customNode",
@@ -314,8 +314,8 @@
         "version": "v1"
       },
       "position_absolute": {
-        "x": 718.1611133820337,
-        "y": 249.85079770730977,
+        "x": 510.7653848191285,
+        "y": 168.88882880307412,
         "zoom": 0.0
       }
     },
@@ -324,8 +324,8 @@
       "height": 287,
       "id": "operator_user_input_parsed_operator___$$___common___$$___v1_0",
       "position": {
-        "x": 249.12038949461203,
-        "y": 524.4121236843054,
+        "x": 194.77605420272772,
+        "y": 349.1793690696583,
         "zoom": 0.0
       },
       "type": "customNode",
@@ -382,80 +382,8 @@
         "version": "v1"
       },
       "position_absolute": {
-        "x": 249.12038949461203,
-        "y": 524.4121236843054,
-        "zoom": 0.0
-      }
-    },
-    {
-      "width": 288,
-      "height": 285,
-      "id": "resource_dbgpt.core.interface.operators.prompt_operator.CommonChatPromptTemplate_0",
-      "position": {
-        "x": 696.5240557312455,
-        "y": 797.1640131885014,
-        "zoom": 0.0
-      },
-      "type": "customNode",
-      "data": {
-        "type_name": "CommonChatPromptTemplate",
-        "type_cls": "dbgpt.core.interface.operators.prompt_operator.CommonChatPromptTemplate",
-        "label": "Common Chat Prompt Template",
-        "name": "common_chat_prompt_template",
-        "description": "The operator to build the prompt with static prompt.",
-        "category": "common",
-        "category_label": "Common",
-        "flow_type": "resource",
-        "icon": null,
-        "documentation_url": null,
-        "id": "resource_dbgpt.core.interface.operators.prompt_operator.CommonChatPromptTemplate_0",
-        "tags": null,
-        "parameters": [
-          {
-            "type_name": "str",
-            "type_cls": "builtins.str",
-            "label": "System Message",
-            "name": "system_message",
-            "is_list": false,
-            "category": "common",
-            "resource_category": null,
-            "resource_type": "instance",
-            "optional": true,
-            "default": null,
-            "placeholder": null,
-            "description": "The system message.",
-            "options": null,
-            "value": "You are a helpful AI Assistant."
-          },
-          {
-            "type_name": "str",
-            "type_cls": "builtins.str",
-            "label": "Human Message",
-            "name": "human_message",
-            "is_list": false,
-            "category": "common",
-            "resource_category": null,
-            "resource_type": "instance",
-            "optional": false,
-            "default": null,
-            "placeholder": "{user_input}",
-            "description": "The human message.",
-            "options": null,
-            "value": "{user_input}"
-          }
-        ],
-        "resource_type": "instance",
-        "parent_cls": [
-          "dbgpt.core.interface.operators.prompt_operator.CommonChatPromptTemplate",
-          "dbgpt.core.interface.prompt.ChatPromptTemplate",
-          "dbgpt.core.interface.prompt.BasePromptTemplate",
-          "pydantic.main.BaseModel",
-          "pydantic.utils.Representation"
-        ]
-      },
-      "position_absolute": {
-        "x": 696.5240557312455,
-        "y": 797.1640131885014,
+        "x": 194.77605420272772,
+        "y": 349.1793690696583,
         "zoom": 0.0
       }
     },
@@ -464,8 +392,8 @@
       "height": 497,
       "id": "operator_common_llm_http_trigger___$$___trigger___$$___v1_0",
       "position": {
-        "x": 16.84607953757768,
-        "y": -147.67519806447115,
+        "x": -169.47735574888253,
+        "y": -148.78426613165246,
         "zoom": 0.0
       },
       "type": "customNode",
@@ -604,8 +532,8 @@
         "version": "v1"
       },
       "position_absolute": {
-        "x": 16.84607953757768,
-        "y": -147.67519806447115,
+        "x": -169.47735574888253,
+        "y": -148.78426613165246,
         "zoom": 0.0
       }
     },
@@ -614,8 +542,8 @@
       "height": 257,
       "id": "operator_streaming_llm_operator___$$___llm___$$___v1_0",
       "position": {
-        "x": 1423.5250071321184,
-        "y": -85.39398525746881,
+        "x": 1551.067834857969,
+        "y": 319.41585926370954,
         "zoom": 0.0
       },
       "type": "customNode",
@@ -672,8 +600,8 @@
         "version": "v1"
       },
       "position_absolute": {
-        "x": 1423.5250071321184,
-        "y": -85.39398525746881,
+        "x": 1551.067834857969,
+        "y": 319.41585926370954,
         "zoom": 0.0
       }
     },
@@ -682,8 +610,8 @@
       "height": 187,
       "id": "operator_openai_streaming_output_operator___$$___output_parser___$$___v1_0",
       "position": {
-        "x": 1795.311906157843,
-        "y": -22.71950234545774,
+        "x": 1926.1819380852373,
+        "y": 382.09034217572065,
         "zoom": 0.0
       },
       "type": "customNode",
@@ -723,8 +651,96 @@
         "version": "v1"
       },
       "position_absolute": {
-        "x": 1795.311906157843,
-        "y": -22.71950234545774,
+        "x": 1926.1819380852373,
+        "y": 382.09034217572065,
+        "zoom": 0.0
+      }
+    },
+    {
+      "width": 288,
+      "height": 352,
+      "id": "resource_dbgpt.core.interface.operators.prompt_operator.CommonChatPromptTemplate_0",
+      "position": {
+        "x": 193.08239142652076,
+        "y": 728.8697472631898,
+        "zoom": 0.0
+      },
+      "type": "customNode",
+      "data": {
+        "type_name": "CommonChatPromptTemplate",
+        "type_cls": "dbgpt.core.interface.operators.prompt_operator.CommonChatPromptTemplate",
+        "label": "Common Chat Prompt Template",
+        "name": "common_chat_prompt_template",
+        "description": "The operator to build the prompt with static prompt.",
+        "category": "prompt",
+        "category_label": "Prompt",
+        "flow_type": "resource",
+        "icon": null,
+        "documentation_url": null,
+        "id": "resource_dbgpt.core.interface.operators.prompt_operator.CommonChatPromptTemplate_0",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "System Message",
+            "name": "system_message",
+            "is_list": false,
+            "category": "common",
+            "resource_category": null,
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The system message.",
+            "options": null,
+            "value": "You are a helpful AI Assistant."
+          },
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Message placeholder",
+            "name": "message_placeholder",
+            "is_list": false,
+            "category": "common",
+            "resource_category": null,
+            "resource_type": "instance",
+            "optional": true,
+            "default": "chat_history",
+            "placeholder": null,
+            "description": "The chat history message placeholder.",
+            "options": null,
+            "value": null
+          },
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Human Message",
+            "name": "human_message",
+            "is_list": false,
+            "category": "common",
+            "resource_category": null,
+            "resource_type": "instance",
+            "optional": true,
+            "default": "{user_input}",
+            "placeholder": "{user_input}",
+            "description": "The human message.",
+            "options": null,
+            "value": null
+          }
+        ],
+        "resource_type": "instance",
+        "parent_cls": [
+          "dbgpt.core.interface.operators.prompt_operator.CommonChatPromptTemplate",
+          "dbgpt.core.interface.prompt.ChatPromptTemplate",
+          "dbgpt.core.interface.prompt.BasePromptTemplate",
+          "pydantic.main.BaseModel",
+          "pydantic.utils.Representation"
+        ]
+      },
+      "position_absolute": {
+        "x": 193.08239142652076,
+        "y": 728.8697472631898,
         "zoom": 0.0
       }
     }
@@ -781,16 +797,6 @@
       "type": "buttonedge"
     },
     {
-      "source": "resource_dbgpt.core.interface.operators.prompt_operator.CommonChatPromptTemplate_0",
-      "source_order": 0,
-      "target": "operator_history_prompt_builder_operator___$$___conversion___$$___v1_0",
-      "target_order": 0,
-      "id": "resource_dbgpt.core.interface.operators.prompt_operator.CommonChatPromptTemplate_0|operator_history_prompt_builder_operator___$$___conversion___$$___v1_0",
-      "source_handle": "resource_dbgpt.core.interface.operators.prompt_operator.CommonChatPromptTemplate_0|outputs|0",
-      "target_handle": "operator_history_prompt_builder_operator___$$___conversion___$$___v1_0|parameters|0",
-      "type": "buttonedge"
-    },
-    {
       "source": "operator_common_llm_http_trigger___$$___trigger___$$___v1_0",
       "source_order": 0,
       "target": "operator_user_input_parsed_operator___$$___common___$$___v1_0",
@@ -829,11 +835,21 @@
       "source_handle": "operator_streaming_llm_operator___$$___llm___$$___v1_0|outputs|0",
       "target_handle": "operator_openai_streaming_output_operator___$$___output_parser___$$___v1_0|inputs|0",
       "type": "buttonedge"
+    },
+    {
+      "source": "resource_dbgpt.core.interface.operators.prompt_operator.CommonChatPromptTemplate_0",
+      "source_order": 0,
+      "target": "operator_history_prompt_builder_operator___$$___conversion___$$___v1_0",
+      "target_order": 0,
+      "id": "resource_dbgpt.core.interface.operators.prompt_operator.CommonChatPromptTemplate_0|operator_history_prompt_builder_operator___$$___conversion___$$___v1_0",
+      "source_handle": "resource_dbgpt.core.interface.operators.prompt_operator.CommonChatPromptTemplate_0|outputs|0",
+      "target_handle": "operator_history_prompt_builder_operator___$$___conversion___$$___v1_0|parameters|0",
+      "type": "buttonedge"
     }
   ],
   "viewport": {
-    "x": 150.49199071564283,
-    "y": 219.84769466666415,
-    "zoom": 0.8885122125471072
+    "x": 213.18796571568487,
+    "y": 269.58887468087215,
+    "zoom": 0.9016579140552604
   }
 }
