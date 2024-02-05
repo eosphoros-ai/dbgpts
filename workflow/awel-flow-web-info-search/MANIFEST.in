@@ -1,0 +1,2 @@
+include dbgpts.toml
+include awel_flow_web_info_search/definition/*.json

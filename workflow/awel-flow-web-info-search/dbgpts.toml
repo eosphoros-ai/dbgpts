@@ -1,0 +1,15 @@
+[flow]
+label = "AI Info Search Flow"
+# A unique name for all dbgpts
+name = "ai_info_search_flow"
+version = "0.1.0"
+description = "Search and summary info use web searchengine"
+authors = ["Henry Yang <yhjun1026@gmail.com>"]
+# How to define the flow, python or json
+definition_type = "json"
+
+[python_config]
+
+# Json config
+[json_config]
+file_path = "definition/flow_definition.json"

@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "awel-flow-web-info-search"
+version = "0.1.0"
+description = "A simple ai info search flow."
+authors = ["Henry Yang <yhjun1026@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+
