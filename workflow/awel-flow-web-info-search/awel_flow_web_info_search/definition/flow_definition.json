@@ -1,1 +1,599 @@
-{"nodes": [{"width": 288, "height": 115, "id": "operator_agent_trigger___$$___trigger___$$___v1_0", "position": {"x": -408.27115207296777, "y": 83.18027249423469, "zoom": 0}, "type": "customNode", "data": {"label": "Agent Trigger", "name": "agent_trigger", "description": "Trigger your workflow by agent", "category": "trigger", "category_label": "Trigger", "flow_type": "operator", "icon": null, "documentation_url": null, "id": "operator_agent_trigger___$$___trigger___$$___v1_0", "tags": null, "parameters": [], "operator_type": "input", "inputs": [], "outputs": [{"type_name": "AgentGenerateContext", "type_cls": "dbgpt.agent.agents.agent.AgentGenerateContext", "label": "Agent Operator Context", "name": "agent_operator_context", "description": "The Agent Operator output.", "is_list": false}], "version": "v1"}, "position_absolute": {"x": -408.27115207296777, "y": 83.18027249423469, "zoom": 0}}, {"width": 288, "height": 256, "id": "operator_agent_operator___$$___agent___$$___v1_0", "position": {"x": 233.436932956997, "y": 34.757704677234656, "zoom": 0}, "type": "customNode", "data": {"label": "Agent Operator", "name": "agent_operator", "description": "The Agent operator.", "category": "agent", "category_label": "Agent", "flow_type": "operator", "icon": null, "documentation_url": null, "id": "operator_agent_operator___$$___agent___$$___v1_0", "tags": null, "parameters": [{"type_name": "AwelAgent", "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent", "label": "Agent", "name": "awel_agent", "is_list": false, "category": "resource", "resource_type": "instance", "optional": true, "default": null, "placeholder": null, "description": "The dbgpt agent.", "options": null, "value": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0"}], "operator_type": "map", "inputs": [{"type_name": "AgentGenerateContext", "type_cls": "dbgpt.agent.agents.agent.AgentGenerateContext", "label": "Agent Operator Request", "name": "agent_operator_request", "description": "The Agent Operator request.", "is_list": false}], "outputs": [{"type_name": "AgentGenerateContext", "type_cls": "dbgpt.agent.agents.agent.AgentGenerateContext", "label": "Agent Operator Output", "name": "agent_operator_output", "description": "The Agent Operator output.", "is_list": false}], "version": "v1"}, "position_absolute": {"x": 233.436932956997, "y": 34.757704677234656, "zoom": 0}}, {"width": 288, "height": 256, "id": "operator_agent_operator___$$___agent___$$___v1_1", "position": {"x": 753.7650088631558, "y": 31.36787638906881, "zoom": 0}, "type": "customNode", "data": {"label": "Agent Operator", "name": "agent_operator", "description": "The Agent operator.", "category": "agent", "category_label": "Agent", "flow_type": "operator", "icon": null, "documentation_url": null, "id": "operator_agent_operator___$$___agent___$$___v1_1", "tags": null, "parameters": [{"type_name": "AwelAgent", "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent", "label": "Agent", "name": "awel_agent", "is_list": false, "category": "resource", "resource_type": "instance", "optional": true, "default": null, "placeholder": null, "description": "The dbgpt agent.", "options": null, "value": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_1"}], "operator_type": "map", "inputs": [{"type_name": "AgentGenerateContext", "type_cls": "dbgpt.agent.agents.agent.AgentGenerateContext", "label": "Agent Operator Request", "name": "agent_operator_request", "description": "The Agent Operator request.", "is_list": false}], "outputs": [{"type_name": "AgentGenerateContext", "type_cls": "dbgpt.agent.agents.agent.AgentGenerateContext", "label": "Agent Operator Output", "name": "agent_operator_output", "description": "The Agent Operator output.", "is_list": false}], "version": "v1"}, "position_absolute": {"x": 753.7650088631558, "y": 31.36787638906881, "zoom": 0}}, {"width": 288, "height": 357, "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0", "position": {"x": -89.83828337717262, "y": 346.9284549361587, "zoom": 0}, "type": "customNode", "data": {"type_name": "AwelAgent", "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent", "label": "Awel Layout Agent", "name": "agent_operator_agent", "description": "The Agent to build the Agent Operator.", "category": "agent", "category_label": "Agent", "flow_type": "resource", "icon": null, "documentation_url": null, "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0", "tags": null, "parameters": [{"type_name": "str", "type_cls": "builtins.str", "label": "Agent Profile", "name": "agent_profile", "is_list": false, "category": "common", "resource_type": "instance", "optional": true, "default": null, "placeholder": null, "description": "Which agent want use.", "options": [{"label": "CodeEngineer", "name": "CodeEngineer", "value": "CodeEngineer"}, {"label": "Reporter", "name": "Reporter", "value": "Reporter"}, {"label": "DataScientist", "name": "DataScientist", "value": "DataScientist"}, {"label": "Summarizer", "name": "Summarizer", "value": "Summarizer"}, {"label": "ToolExpert", "name": "ToolExpert", "value": "ToolExpert"}], "value": "ToolExpert"}, {"type_name": "str", "type_cls": "builtins.str", "label": "Role Name", "name": "role_name", "is_list": false, "category": "common", "resource_type": "instance", "optional": true, "default": null, "placeholder": null, "description": "The agent role name.", "options": null, "value": "Tuyang"}, {"type_name": "AwelAgentResource", "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource", "label": "Agent Resource", "name": "agent_resource", "is_list": false, "category": "resource", "resource_type": "instance", "optional": true, "default": null, "placeholder": null, "description": "The agent resource.", "options": null, "value": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource_0"}, {"type_name": "AwelAgentConfig", "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentConfig", "label": "Agent LLM  Config", "name": "agent_llm_Config", "is_list": false, "category": "resource", "resource_type": "instance", "optional": true, "default": null, "placeholder": null, "description": "The agent llm config.", "options": null, "value": null}], "resource_type": "instance", "parent_cls": ["dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent", "pydantic.main.BaseModel", "pydantic.utils.Representation"]}, "position_absolute": {"x": -89.83828337717262, "y": 346.9284549361587, "zoom": 0}}, {"width": 288, "height": 348, "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource_0", "position": {"x": -462.6390999955822, "y": 712.0897714630032, "zoom": 0}, "type": "customNode", "data": {"type_name": "AwelAgentResource", "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource", "label": "Awel Agent Resource", "name": "agent_operator_resource", "description": "The Agent Resource.", "category": "agent", "category_label": "Agent", "flow_type": "resource", "icon": null, "documentation_url": null, "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource_0", "tags": null, "parameters": [{"type_name": "str", "type_cls": "builtins.str", "label": "Agent Resource Type", "name": "agent_resource_type", "is_list": false, "category": "common", "resource_type": "instance", "optional": true, "default": null, "placeholder": null, "description": "Agent Resource Type", "options": [{"label": "DB", "name": "database", "value": "database"}, {"label": "Knowledge", "name": "knowledge", "value": "knowledge"}, {"label": "Internet", "name": "internet", "value": "internet"}, {"label": "Plugin", "name": "plugin", "value": "plugin"}, {"label": "File", "name": "file", "value": "file"}], "value": "plugin"}, {"type_name": "str", "type_cls": "builtins.str", "label": "Agent Resource Name", "name": "agent_resource_name", "is_list": false, "category": "common", "resource_type": "instance", "optional": true, "default": null, "placeholder": null, "description": "The agent resource name.", "options": null, "value": "测试插件"}, {"type_name": "str", "type_cls": "builtins.str", "label": "Agent Resource Value", "name": "agent_resource_value", "is_list": false, "category": "common", "resource_type": "instance", "optional": true, "default": null, "placeholder": null, "description": "The agent resource value.", "options": null, "value": "Search-Engine-Plugin"}], "resource_type": "instance", "parent_cls": ["dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource", "dbgpt.agent.resource.resource_api.AgentResource"]}, "position_absolute": {"x": -462.6390999955822, "y": 712.0897714630032, "zoom": 0}}, {"width": 288, "height": 357, "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_1", "position": {"x": 313.0765897433604, "y": 340.9195279430129, "zoom": 0}, "type": "customNode", "data": {"type_name": "AwelAgent", "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent", "label": "Awel Layout Agent", "name": "agent_operator_agent", "description": "The Agent to build the Agent Operator.", "category": "agent", "category_label": "Agent", "flow_type": "resource", "icon": null, "documentation_url": null, "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_1", "tags": null, "parameters": [{"type_name": "str", "type_cls": "builtins.str", "label": "Agent Profile", "name": "agent_profile", "is_list": false, "category": "common", "resource_type": "instance", "optional": true, "default": null, "placeholder": null, "description": "Which agent want use.", "options": [{"label": "CodeEngineer", "name": "CodeEngineer", "value": "CodeEngineer"}, {"label": "Reporter", "name": "Reporter", "value": "Reporter"}, {"label": "DataScientist", "name": "DataScientist", "value": "DataScientist"}, {"label": "Summarizer", "name": "Summarizer", "value": "Summarizer"}, {"label": "ToolExpert", "name": "ToolExpert", "value": "ToolExpert"}], "value": "Summarizer"}, {"type_name": "str", "type_cls": "builtins.str", "label": "Role Name", "name": "role_name", "is_list": false, "category": "common", "resource_type": "instance", "optional": true, "default": null, "placeholder": null, "description": "The agent role name.", "options": null, "value": "DR"}, {"type_name": "AwelAgentResource", "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource", "label": "Agent Resource", "name": "agent_resource", "is_list": false, "category": "resource", "resource_type": "instance", "optional": true, "default": null, "placeholder": null, "description": "The agent resource.", "options": null, "value": null}, {"type_name": "AwelAgentConfig", "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentConfig", "label": "Agent LLM  Config", "name": "agent_llm_Config", "is_list": false, "category": "resource", "resource_type": "instance", "optional": true, "default": null, "placeholder": null, "description": "The agent llm config.", "options": null, "value": null}], "resource_type": "instance", "parent_cls": ["dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent", "pydantic.main.BaseModel", "pydantic.utils.Representation"]}, "position_absolute": {"x": 313.0765897433604, "y": 340.9195279430129, "zoom": 0}}], "edges": [{"source": "operator_agent_trigger___$$___trigger___$$___v1_0", "source_order": 0, "target": "operator_agent_operator___$$___agent___$$___v1_0", "target_order": 0, "id": "operator_agent_trigger___$$___trigger___$$___v1_0|operator_agent_operator___$$___agent___$$___v1_0", "source_handle": "operator_agent_trigger___$$___trigger___$$___v1_0|outputs|0", "target_handle": "operator_agent_operator___$$___agent___$$___v1_0|inputs|0", "type": "buttonedge"}, {"source": "operator_agent_operator___$$___agent___$$___v1_0", "source_order": 0, "target": "operator_agent_operator___$$___agent___$$___v1_1", "target_order": 0, "id": "operator_agent_operator___$$___agent___$$___v1_0|operator_agent_operator___$$___agent___$$___v1_1", "source_handle": "operator_agent_operator___$$___agent___$$___v1_0|outputs|0", "target_handle": "operator_agent_operator___$$___agent___$$___v1_1|inputs|0", "type": "buttonedge"}, {"source": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0", "source_order": 0, "target": "operator_agent_operator___$$___agent___$$___v1_0", "target_order": 0, "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0|operator_agent_operator___$$___agent___$$___v1_0", "source_handle": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0|outputs|0", "target_handle": "operator_agent_operator___$$___agent___$$___v1_0|parameters|0", "type": "buttonedge"}, {"source": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_1", "source_order": 0, "target": "operator_agent_operator___$$___agent___$$___v1_1", "target_order": 0, "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_1|operator_agent_operator___$$___agent___$$___v1_1", "source_handle": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_1|outputs|0", "target_handle": "operator_agent_operator___$$___agent___$$___v1_1|parameters|0", "type": "buttonedge"}, {"source": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource_0", "source_order": 0, "target": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0", "target_order": 2, "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource_0|resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0", "source_handle": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource_0|outputs|0", "target_handle": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0|parameters|2", "type": "buttonedge"}], "viewport": {"x": 359.44599576517567, "y": 63.070724743546975, "zoom": 0.5787488546816009}}
+{
+  "nodes": [
+    {
+      "width": 288,
+      "height": 115,
+      "id": "operator_agent_trigger___$$___agent___$$___v1_0",
+      "position": {
+        "x": -408.27115207296777,
+        "y": 83.18027249423469,
+        "zoom": 0
+      },
+      "type": "customNode",
+      "data": {
+        "label": "Agent Trigger",
+        "name": "agent_trigger",
+        "type_name": "AgentDummyTrigger",
+        "type_cls": "dbgpt.serve.agent.team.layout.agent_operator.AgentDummyTrigger",
+        "description": "Trigger your workflow by agent",
+        "category": "agent",
+        "category_label": "Trigger",
+        "flow_type": "operator",
+        "icon": null,
+        "documentation_url": null,
+        "id": "operator_agent_trigger___$$___agent___$$___v1_0",
+        "tags": null,
+        "parameters": [],
+        "operator_type": "input",
+        "inputs": [],
+        "outputs": [
+          {
+            "type_name": "AgentGenerateContext",
+            "type_cls": "dbgpt.agent.agents.agent.AgentGenerateContext",
+            "label": "Agent Operator Context",
+            "name": "agent_operator_context",
+            "description": "The Agent Operator output.",
+            "is_list": false
+          }
+        ],
+        "version": "v1"
+      },
+      "position_absolute": {
+        "x": -408.27115207296777,
+        "y": 83.18027249423469,
+        "zoom": 0
+      }
+    },
+    {
+      "width": 288,
+      "height": 256,
+      "id": "operator_agent_operator___$$___agent___$$___v1_0",
+      "position": {
+        "x": 233.436932956997,
+        "y": 34.757704677234656,
+        "zoom": 0
+      },
+      "type": "customNode",
+      "data": {
+        "label": "Agent Operator",
+        "name": "agent_operator",
+        "type_name": "AwelAgentOperator",
+        "type_cls": "dbgpt.serve.agent.team.layout.agent_operator.AwelAgentOperator",
+        "description": "The Agent operator.",
+        "category": "agent",
+        "category_label": "Agent",
+        "flow_type": "operator",
+        "icon": null,
+        "documentation_url": null,
+        "id": "operator_agent_operator___$$___agent___$$___v1_0",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "AwelAgent",
+            "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent",
+            "label": "Agent",
+            "name": "awel_agent",
+            "is_list": false,
+            "category": "resource",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The dbgpt agent.",
+            "options": null,
+            "value": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0"
+          }
+        ],
+        "operator_type": "map",
+        "inputs": [
+          {
+            "type_name": "AgentGenerateContext",
+            "type_cls": "dbgpt.agent.agents.agent.AgentGenerateContext",
+            "label": "Agent Operator Request",
+            "name": "agent_operator_request",
+            "description": "The Agent Operator request.",
+            "is_list": false
+          }
+        ],
+        "outputs": [
+          {
+            "type_name": "AgentGenerateContext",
+            "type_cls": "dbgpt.agent.agents.agent.AgentGenerateContext",
+            "label": "Agent Operator Output",
+            "name": "agent_operator_output",
+            "description": "The Agent Operator output.",
+            "is_list": false
+          }
+        ],
+        "version": "v1"
+      },
+      "position_absolute": {
+        "x": 233.436932956997,
+        "y": 34.757704677234656,
+        "zoom": 0
+      }
+    },
+    {
+      "width": 288,
+      "height": 256,
+      "id": "operator_agent_operator___$$___agent___$$___v1_1",
+      "position": {
+        "x": 753.7650088631558,
+        "y": 31.36787638906881,
+        "zoom": 0
+      },
+      "type": "customNode",
+      "data": {
+        "label": "Agent Operator",
+        "name": "agent_operator",
+        "type_name": "AgentDummyTrigger",
+        "type_cls": "dbgpt.serve.agent.team.layout.agent_operator.AgentDummyTrigger",
+        "description": "The Agent operator.",
+        "category": "agent",
+        "category_label": "Agent",
+        "flow_type": "operator",
+        "icon": null,
+        "documentation_url": null,
+        "id": "operator_agent_operator___$$___agent___$$___v1_1",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "AwelAgent",
+            "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent",
+            "label": "Agent",
+            "name": "awel_agent",
+            "is_list": false,
+            "category": "resource",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The dbgpt agent.",
+            "options": null,
+            "value": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_1"
+          }
+        ],
+        "operator_type": "map",
+        "inputs": [
+          {
+            "type_name": "AgentGenerateContext",
+            "type_cls": "dbgpt.agent.agents.agent.AgentGenerateContext",
+            "label": "Agent Operator Request",
+            "name": "agent_operator_request",
+            "description": "The Agent Operator request.",
+            "is_list": false
+          }
+        ],
+        "outputs": [
+          {
+            "type_name": "AgentGenerateContext",
+            "type_cls": "dbgpt.agent.agents.agent.AgentGenerateContext",
+            "label": "Agent Operator Output",
+            "name": "agent_operator_output",
+            "description": "The Agent Operator output.",
+            "is_list": false
+          }
+        ],
+        "version": "v1"
+      },
+      "position_absolute": {
+        "x": 753.7650088631558,
+        "y": 31.36787638906881,
+        "zoom": 0
+      }
+    },
+    {
+      "width": 288,
+      "height": 357,
+      "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0",
+      "position": {
+        "x": -89.83828337717262,
+        "y": 346.9284549361587,
+        "zoom": 0
+      },
+      "type": "customNode",
+      "data": {
+        "type_name": "AwelAgent",
+        "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent",
+        "label": "Awel Layout Agent",
+        "name": "agent_operator_agent",
+        "description": "The Agent to build the Agent Operator.",
+        "category": "agent",
+        "category_label": "Agent",
+        "flow_type": "resource",
+        "icon": null,
+        "documentation_url": null,
+        "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Agent Profile",
+            "name": "agent_profile",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "Which agent want use.",
+            "options": [
+              {
+                "label": "CodeEngineer",
+                "name": "CodeEngineer",
+                "value": "CodeEngineer"
+              },
+              {
+                "label": "Reporter",
+                "name": "Reporter",
+                "value": "Reporter"
+              },
+              {
+                "label": "DataScientist",
+                "name": "DataScientist",
+                "value": "DataScientist"
+              },
+              {
+                "label": "Summarizer",
+                "name": "Summarizer",
+                "value": "Summarizer"
+              },
+              {
+                "label": "ToolExpert",
+                "name": "ToolExpert",
+                "value": "ToolExpert"
+              }
+            ],
+            "value": "ToolExpert"
+          },
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Role Name",
+            "name": "role_name",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The agent role name.",
+            "options": null,
+            "value": "Tuyang"
+          },
+          {
+            "type_name": "AwelAgentResource",
+            "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource",
+            "label": "Agent Resource",
+            "name": "agent_resource",
+            "is_list": false,
+            "category": "resource",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The agent resource.",
+            "options": null,
+            "value": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource_0"
+          },
+          {
+            "type_name": "AwelAgentConfig",
+            "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentConfig",
+            "label": "Agent LLM  Config",
+            "name": "agent_llm_Config",
+            "is_list": false,
+            "category": "resource",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The agent llm config.",
+            "options": null,
+            "value": null
+          }
+        ],
+        "resource_type": "instance",
+        "parent_cls": [
+          "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent",
+          "pydantic.main.BaseModel",
+          "pydantic.utils.Representation"
+        ]
+      },
+      "position_absolute": {
+        "x": -89.83828337717262,
+        "y": 346.9284549361587,
+        "zoom": 0
+      }
+    },
+    {
+      "width": 288,
+      "height": 348,
+      "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource_0",
+      "position": {
+        "x": -462.6390999955822,
+        "y": 712.0897714630032,
+        "zoom": 0
+      },
+      "type": "customNode",
+      "data": {
+        "type_name": "AwelAgentResource",
+        "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource",
+        "label": "Awel Agent Resource",
+        "name": "agent_operator_resource",
+        "description": "The Agent Resource.",
+        "category": "agent",
+        "category_label": "Agent",
+        "flow_type": "resource",
+        "icon": null,
+        "documentation_url": null,
+        "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource_0",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Agent Resource Type",
+            "name": "agent_resource_type",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "Agent Resource Type",
+            "options": [
+              {
+                "label": "DB",
+                "name": "database",
+                "value": "database"
+              },
+              {
+                "label": "Knowledge",
+                "name": "knowledge",
+                "value": "knowledge"
+              },
+              {
+                "label": "Internet",
+                "name": "internet",
+                "value": "internet"
+              },
+              {
+                "label": "Plugin",
+                "name": "plugin",
+                "value": "plugin"
+              },
+              {
+                "label": "File",
+                "name": "file",
+                "value": "file"
+              }
+            ],
+            "value": "plugin"
+          },
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Agent Resource Name",
+            "name": "agent_resource_name",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The agent resource name.",
+            "options": null,
+            "value": "测试插件"
+          },
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Agent Resource Value",
+            "name": "agent_resource_value",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The agent resource value.",
+            "options": null,
+            "value": "Search-Engine-Plugin"
+          }
+        ],
+        "resource_type": "instance",
+        "parent_cls": [
+          "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource",
+          "dbgpt.agent.resource.resource_api.AgentResource"
+        ]
+      },
+      "position_absolute": {
+        "x": -462.6390999955822,
+        "y": 712.0897714630032,
+        "zoom": 0
+      }
+    },
+    {
+      "width": 288,
+      "height": 357,
+      "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_1",
+      "position": {
+        "x": 313.0765897433604,
+        "y": 340.9195279430129,
+        "zoom": 0
+      },
+      "type": "customNode",
+      "data": {
+        "type_name": "AwelAgent",
+        "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent",
+        "label": "Awel Layout Agent",
+        "name": "agent_operator_agent",
+        "description": "The Agent to build the Agent Operator.",
+        "category": "agent",
+        "category_label": "Agent",
+        "flow_type": "resource",
+        "icon": null,
+        "documentation_url": null,
+        "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_1",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Agent Profile",
+            "name": "agent_profile",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "Which agent want use.",
+            "options": [
+              {
+                "label": "CodeEngineer",
+                "name": "CodeEngineer",
+                "value": "CodeEngineer"
+              },
+              {
+                "label": "Reporter",
+                "name": "Reporter",
+                "value": "Reporter"
+              },
+              {
+                "label": "DataScientist",
+                "name": "DataScientist",
+                "value": "DataScientist"
+              },
+              {
+                "label": "Summarizer",
+                "name": "Summarizer",
+                "value": "Summarizer"
+              },
+              {
+                "label": "ToolExpert",
+                "name": "ToolExpert",
+                "value": "ToolExpert"
+              }
+            ],
+            "value": "Summarizer"
+          },
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Role Name",
+            "name": "role_name",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The agent role name.",
+            "options": null,
+            "value": "DR"
+          },
+          {
+            "type_name": "AwelAgentResource",
+            "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource",
+            "label": "Agent Resource",
+            "name": "agent_resource",
+            "is_list": false,
+            "category": "resource",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The agent resource.",
+            "options": null,
+            "value": null
+          },
+          {
+            "type_name": "AwelAgentConfig",
+            "type_cls": "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentConfig",
+            "label": "Agent LLM  Config",
+            "name": "agent_llm_Config",
+            "is_list": false,
+            "category": "resource",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The agent llm config.",
+            "options": null,
+            "value": null
+          }
+        ],
+        "resource_type": "instance",
+        "parent_cls": [
+          "dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent",
+          "pydantic.main.BaseModel",
+          "pydantic.utils.Representation"
+        ]
+      },
+      "position_absolute": {
+        "x": 313.0765897433604,
+        "y": 340.9195279430129,
+        "zoom": 0
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "operator_agent_trigger___$$___agent___$$___v1_0",
+      "source_order": 0,
+      "target": "operator_agent_operator___$$___agent___$$___v1_0",
+      "target_order": 0,
+      "id": "operator_agent_trigger___$$___agent___$$___v1_0|operator_agent_operator___$$___agent___$$___v1_0",
+      "source_handle": "operator_agent_trigger___$$___agent___$$___v1_0|outputs|0",
+      "target_handle": "operator_agent_operator___$$___agent___$$___v1_0|inputs|0",
+      "type": "buttonedge"
+    },
+    {
+      "source": "operator_agent_operator___$$___agent___$$___v1_0",
+      "source_order": 0,
+      "target": "operator_agent_operator___$$___agent___$$___v1_1",
+      "target_order": 0,
+      "id": "operator_agent_operator___$$___agent___$$___v1_0|operator_agent_operator___$$___agent___$$___v1_1",
+      "source_handle": "operator_agent_operator___$$___agent___$$___v1_0|outputs|0",
+      "target_handle": "operator_agent_operator___$$___agent___$$___v1_1|inputs|0",
+      "type": "buttonedge"
+    },
+    {
+      "source": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0",
+      "source_order": 0,
+      "target": "operator_agent_operator___$$___agent___$$___v1_0",
+      "target_order": 0,
+      "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0|operator_agent_operator___$$___agent___$$___v1_0",
+      "source_handle": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0|outputs|0",
+      "target_handle": "operator_agent_operator___$$___agent___$$___v1_0|parameters|0",
+      "type": "buttonedge"
+    },
+    {
+      "source": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_1",
+      "source_order": 0,
+      "target": "operator_agent_operator___$$___agent___$$___v1_1",
+      "target_order": 0,
+      "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_1|operator_agent_operator___$$___agent___$$___v1_1",
+      "source_handle": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_1|outputs|0",
+      "target_handle": "operator_agent_operator___$$___agent___$$___v1_1|parameters|0",
+      "type": "buttonedge"
+    },
+    {
+      "source": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource_0",
+      "source_order": 0,
+      "target": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0",
+      "target_order": 2,
+      "id": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource_0|resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0",
+      "source_handle": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgentResource_0|outputs|0",
+      "target_handle": "resource_dbgpt.serve.agent.team.layout.agent_operator_resource.AwelAgent_0|parameters|2",
+      "type": "buttonedge"
+    }
+  ],
+  "viewport": {
+    "x": 359.44599576517567,
+    "y": 63.070724743546975,
+    "zoom": 0.5787488546816009
+  }
+}
