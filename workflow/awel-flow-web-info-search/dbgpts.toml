@@ -1,7 +1,7 @@
 [flow]
 label = "AI Info Search Flow"
 # A unique name for all dbgpts
-name = "ai_info_search_flow"
+name = "awel_flow_web_info_search"
 version = "0.1.0"
 description = "Search and summary info use web searchengine"
 authors = ["Henry Yang <yhjun1026@gmail.com>"]
