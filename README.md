@@ -7,9 +7,8 @@ This repo will contains some data apps、AWEL operators、AWEL workflow template
 - [agents](/agents)
 - [operators](/operators)
 
-The example requires you use the branch `awel-vis` of the `DB-GPT` [repository](https://github.com/eosphoros-ai/DB-GPT/tree/awel-vis).
-
-## Quick Start(Coming soon)
+## Quick Start
+At first you need to install [DB-GPT](https://docs.dbgpt.site/docs/quickstart) project.
 
 We will show how to install a dbgpts from the official repository to your local DB-GPT environment.
 
@@ -24,6 +23,15 @@ Make sure you have installed the required packages:
 ```bash
 pip install poetry
 ```
+### List the available flows
+```bash
+dbgpt app list-remote
+
+# Those workflow can be installed.
+awel-flow-web-info-search(eosphoros/dbgpts/workflow/awel-flow-web-info-search)
+awel-flow-simple-streaming-chat(eosphoros/dbgpts/workflow/awel-flow-simple-streaming-chat)
+awel-flow-example-chat(eosphoros/dbgpts/workflow/awel-flow-example-chat)
+```
 
 ### Install a dbgpts from official repository
 
@@ -37,7 +45,9 @@ Restart DB-GPT to see the new chat flow in the web page.
 
 Like this:
 
-![awel_flow_simple_streaming_chat.png](assets%2Fimg%2Fawel_flow_simple_streaming_chat.png)
+<p align="center">
+  <img src="./assets/img/awel_flow_simple_streaming_chat.jpg" width="1200" />
+</p>
 
 ### Uninstallation
 
