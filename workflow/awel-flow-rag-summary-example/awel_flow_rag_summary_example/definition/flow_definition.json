@@ -1,0 +1,610 @@
+{
+  "nodes": [
+    {
+      "width": 288,
+      "height": 497,
+      "id": "operator_common_llm_http_trigger___$$___trigger___$$___v1_0",
+      "position": {
+        "x": -276.02007990140487,
+        "y": 58.43538101916542,
+        "zoom": 0
+      },
+      "type": "customNode",
+      "data": {
+        "label": "Common LLM Http Trigger",
+        "name": "common_llm_http_trigger",
+        "description": "Trigger your workflow by http request, and parse the request body as a common LLM http body",
+        "category": "trigger",
+        "category_label": "Trigger",
+        "flow_type": "operator",
+        "icon": null,
+        "documentation_url": null,
+        "id": "operator_common_llm_http_trigger___$$___trigger___$$___v1_0",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "API Endpoint",
+            "name": "endpoint",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": false,
+            "default": null,
+            "placeholder": null,
+            "description": "The API endpoint",
+            "options": null,
+            "value": "/rag/summary/example"
+          },
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Http Methods",
+            "name": "methods",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "POST",
+            "placeholder": null,
+            "description": "The methods of the API endpoint",
+            "options": [
+              {
+                "label": "HTTP Method PUT",
+                "name": "http_put",
+                "value": "PUT"
+              },
+              {
+                "label": "HTTP Method POST",
+                "name": "http_post",
+                "value": "POST"
+              }
+            ],
+            "value": null
+          },
+          {
+            "type_name": "bool",
+            "type_cls": "builtins.bool",
+            "label": "Streaming Response",
+            "name": "streaming_response",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "False",
+            "placeholder": null,
+            "description": "Whether the response is streaming",
+            "options": null,
+            "value": null
+          },
+          {
+            "type_name": "BaseHttpBody",
+            "type_cls": "dbgpt.core.awel.trigger.http_trigger.BaseHttpBody",
+            "label": "Http Response Body",
+            "name": "http_response_body",
+            "is_list": false,
+            "category": "resource",
+            "resource_type": "class",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The response body of the API endpoint",
+            "options": null,
+            "value": null
+          },
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Response Media Type",
+            "name": "response_media_type",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The response media type",
+            "options": null,
+            "value": null
+          },
+          {
+            "type_name": "int",
+            "type_cls": "builtins.int",
+            "label": "Http Status Code",
+            "name": "status_code",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "200",
+            "placeholder": null,
+            "description": "The http status code",
+            "options": null,
+            "value": null
+          }
+        ],
+        "operator_type": "input",
+        "inputs": [],
+        "outputs": [
+          {
+            "type_name": "CommonLLMHttpRequestBody",
+            "type_cls": "dbgpt.core.awel.trigger.http_trigger.CommonLLMHttpRequestBody",
+            "label": "Request Body",
+            "name": "request_body",
+            "description": "The request body of the API endpoint, parse as a common LLM http body",
+            "is_list": false
+          }
+        ],
+        "version": "v1",
+        "type_name": "CommonLLMHttpTrigger",
+        "type_cls": "dbgpt.core.awel.trigger.http_trigger.CommonLLMHttpTrigger"
+      },
+      "position_absolute": {
+        "x": -276.02007990140487,
+        "y": 58.43538101916542,
+        "zoom": 0
+      }
+    },
+    {
+      "width": 288,
+      "height": 529,
+      "id": "operator_summary_assembler_operator___$$___rag___$$___v1_0",
+      "position": {
+        "x": 763.646969801427,
+        "y": -22.354310302978178,
+        "zoom": 0
+      },
+      "type": "customNode",
+      "data": {
+        "label": "Summary Operator",
+        "name": "summary_assembler_operator",
+        "description": "The summary assembler operator.",
+        "category": "rag",
+        "category_label": "RAG",
+        "flow_type": "operator",
+        "icon": null,
+        "documentation_url": "https://github.com/openai/openai-python",
+        "id": "operator_summary_assembler_operator___$$___rag___$$___v1_0",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "LLMClient",
+            "type_cls": "dbgpt.core.interface.llm.LLMClient",
+            "label": "LLM Client",
+            "name": "llm_client",
+            "is_list": false,
+            "category": "resource",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The LLM Client.",
+            "options": null,
+            "value": "resource_dbgpt.model.cluster.client.DefaultLLMClient_0"
+          },
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "model name",
+            "name": "model_name",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "chatgpt_proxyllm",
+            "placeholder": null,
+            "description": "llm model name",
+            "options": null,
+            "value": null
+          },
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "prompt language",
+            "name": "language",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "en",
+            "placeholder": null,
+            "description": "prompt language",
+            "options": null,
+            "value": null
+          },
+          {
+            "type_name": "int",
+            "type_cls": "builtins.int",
+            "label": "max_iteration_with_llm",
+            "name": "max_iteration_with_llm",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "5",
+            "placeholder": null,
+            "description": "prompt language",
+            "options": null,
+            "value": null
+          },
+          {
+            "type_name": "int",
+            "type_cls": "builtins.int",
+            "label": "concurrency_limit_with_llm",
+            "name": "concurrency_limit_with_llm",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "3",
+            "placeholder": null,
+            "description": "The concurrency limit with llm",
+            "options": null,
+            "value": null
+          }
+        ],
+        "operator_type": "map",
+        "inputs": [
+          {
+            "type_name": "Knowledge",
+            "type_cls": "dbgpt.rag.knowledge.base.Knowledge",
+            "label": "Knowledge",
+            "name": "knowledge",
+            "description": "knowledge datasource",
+            "is_list": false
+          }
+        ],
+        "outputs": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "document summary",
+            "name": "summary",
+            "description": "document summary",
+            "is_list": false
+          }
+        ],
+        "version": "v1",
+        "type_name": "SummaryAssemblerOperator",
+        "type_cls": "dbgpt.rag.operators.summary.SummaryAssemblerOperator"
+      },
+      "position_absolute": {
+        "x": 763.646969801427,
+        "y": -22.354310302978178,
+        "zoom": 0
+      }
+    },
+    {
+      "width": 288,
+      "height": 287,
+      "id": "operator_request_body_to_dict_operator___$$___common___$$___v1_0",
+      "position": {
+        "x": 92.01342013570303,
+        "y": -123.50592665309253,
+        "zoom": 0
+      },
+      "type": "customNode",
+      "data": {
+        "label": "Request Body To Dict Operator",
+        "name": "request_body_to_dict_operator",
+        "description": "Request body to dict operator",
+        "category": "common",
+        "category_label": "Common",
+        "flow_type": "operator",
+        "icon": null,
+        "documentation_url": null,
+        "id": "operator_request_body_to_dict_operator___$$___common___$$___v1_0",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Prefix Key",
+            "name": "prefix_key",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The prefix key of the dict, link 'context.extra'",
+            "options": null,
+            "value": null
+          }
+        ],
+        "operator_type": "map",
+        "inputs": [
+          {
+            "type_name": "CommonLLMHttpRequestBody",
+            "type_cls": "dbgpt.core.awel.trigger.http_trigger.CommonLLMHttpRequestBody",
+            "label": "Request Body",
+            "name": "request_body",
+            "description": "The request body of the API endpoint",
+            "is_list": false
+          }
+        ],
+        "outputs": [
+          {
+            "type_name": "dict",
+            "type_cls": "builtins.dict",
+            "label": "Response Body",
+            "name": "response_body",
+            "description": "The response body of the API endpoint",
+            "is_list": false
+          }
+        ],
+        "version": "v1",
+        "type_name": "RequestBodyToDictOperator",
+        "type_cls": "dbgpt.core.awel.trigger.http_trigger.RequestBodyToDictOperator"
+      },
+      "position_absolute": {
+        "x": 92.01342013570303,
+        "y": -123.50592665309253,
+        "zoom": 0
+      }
+    },
+    {
+      "width": 288,
+      "height": 355,
+      "id": "operator_knowledge_operator___$$___rag___$$___v1_0",
+      "position": {
+        "x": 443.64767807272324,
+        "y": -208.07619122022396,
+        "zoom": 0
+      },
+      "type": "customNode",
+      "data": {
+        "label": "Knowledge Factory Operator",
+        "name": "knowledge_operator",
+        "description": "The knowledge operator.",
+        "category": "rag",
+        "category_label": "RAG",
+        "flow_type": "operator",
+        "icon": null,
+        "documentation_url": "https://github.com/openai/openai-python",
+        "id": "operator_knowledge_operator___$$___rag___$$___v1_0",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "datasource",
+            "name": "datasource",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "DOCUMENT",
+            "placeholder": null,
+            "description": "datasource",
+            "options": null,
+            "value": "https://docs.dbgpt.site/docs/awel"
+          },
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "knowledge type",
+            "name": "knowledge_type",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "DOCUMENT",
+            "placeholder": null,
+            "description": "knowledge type",
+            "options": [
+              {
+                "label": "DOCUMENT",
+                "name": "DOCUMENT",
+                "value": "DOCUMENT"
+              },
+              {
+                "label": "URL",
+                "name": "URL",
+                "value": "URL"
+              },
+              {
+                "label": "TEXT",
+                "name": "TEXT",
+                "value": "TEXT"
+              }
+            ],
+            "value": "URL"
+          }
+        ],
+        "operator_type": "map",
+        "inputs": [
+          {
+            "type_name": "dict",
+            "type_cls": "builtins.dict",
+            "label": "knowledge datasource",
+            "name": "knowledge datasource",
+            "description": "knowledge datasource",
+            "is_list": false
+          }
+        ],
+        "outputs": [
+          {
+            "type_name": "Knowledge",
+            "type_cls": "dbgpt.rag.knowledge.base.Knowledge",
+            "label": "Knowledge",
+            "name": "Knowledge",
+            "description": "Knowledge",
+            "is_list": false
+          }
+        ],
+        "version": "v1",
+        "type_name": "KnowledgeOperator",
+        "type_cls": "dbgpt.rag.operators.knowledge.KnowledgeOperator"
+      },
+      "position_absolute": {
+        "x": 443.64767807272324,
+        "y": -208.07619122022396,
+        "zoom": 0
+      }
+    },
+    {
+      "width": 288,
+      "height": 186,
+      "id": "resource_dbgpt.model.cluster.client.DefaultLLMClient_0",
+      "position": {
+        "x": 14.8615998288462,
+        "y": 649.49596526753,
+        "zoom": 0
+      },
+      "type": "customNode",
+      "data": {
+        "type_name": "DefaultLLMClient",
+        "type_cls": "dbgpt.model.cluster.client.DefaultLLMClient",
+        "label": "Default LLM Client",
+        "name": "default_llm_client",
+        "description": "Default LLM client(Connect to your DB-GPT model serving)",
+        "category": "llm_client",
+        "category_label": "LLM Client",
+        "flow_type": "resource",
+        "icon": null,
+        "documentation_url": null,
+        "id": "resource_dbgpt.model.cluster.client.DefaultLLMClient_0",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "bool",
+            "type_cls": "builtins.bool",
+            "label": "Auto Convert Message",
+            "name": "auto_convert_message",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "False",
+            "placeholder": null,
+            "description": "Whether to auto convert the messages that are not supported by the LLM to a compatible format",
+            "options": null,
+            "value": null
+          }
+        ],
+        "resource_type": "instance",
+        "parent_cls": [
+          "dbgpt.model.cluster.client.DefaultLLMClient",
+          "dbgpt.core.interface.llm.LLMClient"
+        ]
+      },
+      "position_absolute": {
+        "x": 14.8615998288462,
+        "y": 649.49596526753,
+        "zoom": 0
+      }
+    },
+    {
+      "width": 288,
+      "height": 187,
+      "id": "operator_string_2_model_output_operator___$$___common___$$___v1_0",
+      "position": {
+        "x": 1126.1445500179946,
+        "y": -62.674683718840065,
+        "zoom": 0
+      },
+      "type": "customNode",
+      "data": {
+        "label": "Map String to ModelOutput",
+        "name": "string_2_model_output_operator",
+        "description": "Map String to ModelOutput.",
+        "category": "common",
+        "category_label": "Common",
+        "flow_type": "operator",
+        "icon": null,
+        "documentation_url": null,
+        "id": "operator_string_2_model_output_operator___$$___common___$$___v1_0",
+        "tags": null,
+        "parameters": [],
+        "operator_type": "map",
+        "inputs": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "String",
+            "name": "input_value",
+            "description": "The input value of the operator.",
+            "is_list": false
+          }
+        ],
+        "outputs": [
+          {
+            "type_name": "ModelOutput",
+            "type_cls": "dbgpt.core.interface.llm.ModelOutput",
+            "label": "Model Output",
+            "name": "input_value",
+            "description": "The input value of the operator.",
+            "is_list": false
+          }
+        ],
+        "version": "v1",
+        "type_name": "StringOutput2ModelOutputOperator",
+        "type_cls": "dbgpt.core.interface.operators.llm_operator.StringOutput2ModelOutputOperator"
+      },
+      "position_absolute": {
+        "x": 1126.1445500179946,
+        "y": -62.674683718840065,
+        "zoom": 0
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "operator_common_llm_http_trigger___$$___trigger___$$___v1_0",
+      "source_order": 0,
+      "target": "operator_request_body_to_dict_operator___$$___common___$$___v1_0",
+      "target_order": 0,
+      "id": "operator_common_llm_http_trigger___$$___trigger___$$___v1_0|operator_request_body_to_dict_operator___$$___common___$$___v1_0",
+      "source_handle": "operator_common_llm_http_trigger___$$___trigger___$$___v1_0|outputs|0",
+      "target_handle": "operator_request_body_to_dict_operator___$$___common___$$___v1_0|inputs|0",
+      "type": "buttonedge"
+    },
+    {
+      "source": "operator_request_body_to_dict_operator___$$___common___$$___v1_0",
+      "source_order": 0,
+      "target": "operator_knowledge_operator___$$___rag___$$___v1_0",
+      "target_order": 0,
+      "id": "operator_request_body_to_dict_operator___$$___common___$$___v1_0|operator_knowledge_operator___$$___rag___$$___v1_0",
+      "source_handle": "operator_request_body_to_dict_operator___$$___common___$$___v1_0|outputs|0",
+      "target_handle": "operator_knowledge_operator___$$___rag___$$___v1_0|inputs|0",
+      "type": "buttonedge"
+    },
+    {
+      "source": "operator_knowledge_operator___$$___rag___$$___v1_0",
+      "source_order": 0,
+      "target": "operator_summary_assembler_operator___$$___rag___$$___v1_0",
+      "target_order": 0,
+      "id": "operator_knowledge_operator___$$___rag___$$___v1_0|operator_summary_assembler_operator___$$___rag___$$___v1_0",
+      "source_handle": "operator_knowledge_operator___$$___rag___$$___v1_0|outputs|0",
+      "target_handle": "operator_summary_assembler_operator___$$___rag___$$___v1_0|inputs|0",
+      "type": "buttonedge"
+    },
+    {
+      "source": "resource_dbgpt.model.cluster.client.DefaultLLMClient_0",
+      "source_order": 0,
+      "target": "operator_summary_assembler_operator___$$___rag___$$___v1_0",
+      "target_order": 0,
+      "id": "resource_dbgpt.model.cluster.client.DefaultLLMClient_0|operator_summary_assembler_operator___$$___rag___$$___v1_0",
+      "source_handle": "resource_dbgpt.model.cluster.client.DefaultLLMClient_0|outputs|0",
+      "target_handle": "operator_summary_assembler_operator___$$___rag___$$___v1_0|parameters|0",
+      "type": "buttonedge"
+    },
+    {
+      "source": "operator_summary_assembler_operator___$$___rag___$$___v1_0",
+      "source_order": 0,
+      "target": "operator_string_2_model_output_operator___$$___common___$$___v1_0",
+      "target_order": 0,
+      "id": "operator_summary_assembler_operator___$$___rag___$$___v1_0|operator_string_2_model_output_operator___$$___common___$$___v1_0",
+      "source_handle": "operator_summary_assembler_operator___$$___rag___$$___v1_0|outputs|0",
+      "target_handle": "operator_string_2_model_output_operator___$$___common___$$___v1_0|inputs|0",
+      "type": "buttonedge"
+    }
+  ],
+  "viewport": {
+    "x": 352.983344682908,
+    "y": 191.24247127828346,
+    "zoom": 0.6739957630705257
+  }
+}

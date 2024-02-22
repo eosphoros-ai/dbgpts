@@ -1,0 +1,15 @@
+[flow]
+label = "AWEL Flow Example RAG Chat"
+# A unique name for all dbgpts
+name = "awel_flow_rag_chat_example"
+version = "0.1.0"
+description = "An example of a rag chat flow. It uses a simple rag chat flow to demonstrate how to use the flow to handle user's request and response. The flow is defined in a JSON file."
+authors = ["aries_ckt <916701291@qq.com>"]
+# How to define the flow, python or json
+definition_type = "json"
+
+[python_config]
+
+# Json config
+[json_config]
+file_path = "definition/flow_definition.json"
