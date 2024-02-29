@@ -1,0 +1,11 @@
+[operator]
+label = "Awel Simple Operator"
+name = "awel_simple_operator"
+version = "0.1.0"
+description = ""
+authors = []
+definition_type = "python"
+
+[python_config]
+
+[json_config]
