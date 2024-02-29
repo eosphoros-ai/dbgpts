@@ -100,3 +100,34 @@ The `dbgpts` can manage by multiple repositories, the official repository is [eo
 And you can add you own repository by `dbgpt repo add --repo <repo_name> --url <repo_url>`, example:
 - Your git repo: `dbgpt repo add --repo fangyinc/dbgpts --url https://github.com/fangyinc/dbgpts.git`
 - Your local repo: `dbgpt repo add --repo local/dbgpts --url /path/to/your/repo`
+
+
+## How to create a dbgpts?
+
+### Clone the `dbgpts` repository
+
+### Create a python environment
+
+```bash
+conda create -n dbgpts python=3.10
+conda activate dbgpts
+```
+
+### Install the required packages
+
+```bash
+pip install poetry
+pip install dbgpt
+```
+
+### Create a new workflow template
+
+```bash
+dbgpt new app -n my-awel-flow-example-chat
+```
+
+### Create a new operator
+
+```bash
+dbgpt new app -t operator -n my-awel-operator-example
+```
