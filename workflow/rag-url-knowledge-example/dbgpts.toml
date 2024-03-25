@@ -1,0 +1,12 @@
+[flow]
+label = "Rag Url Knowledge Example"
+name = "rag_url_knowledge_example"
+version = "0.1.0"
+description = "A complete example of RAG based on URL knowledge. Please install the workflow to import knowledge before using it: `dbgpt app install rag-save-url-to-vstore`"
+authors = []
+definition_type = "json"
+
+[python_config]
+
+[json_config]
+file_path = "definition/flow_definition.json"

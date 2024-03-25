@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "rag-save-url-to-vstore"
+name = "rag-url-knowledge-example"
 version = "0.1.0"
-description = "Parse the web page in the URL and load it into the vector store."
+description = "A complete example of RAG based on URL knowledge. Please install the workflow to import knowledge before using it: `dbgpt app install rag-save-url-to-vstore`"
 authors = ["Fangyin Cheng <staneyffer@gmail.com>"]
 readme = "README.md"
 
