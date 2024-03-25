@@ -1,0 +1,12 @@
+[flow]
+label = "RAG Save URL To Vector Store"
+name = "rag_save_url_to_vstore"
+version = "0.1.0"
+description = "Parse the web page in the URL and load it into the vector store."
+authors = []
+definition_type = "json"
+
+[python_config]
+
+[json_config]
+file_path = "definition/flow_definition.json"
