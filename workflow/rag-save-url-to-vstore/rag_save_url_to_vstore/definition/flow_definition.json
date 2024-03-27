@@ -1,0 +1,816 @@
+{
+  "nodes": [
+    {
+      "width": 288,
+      "height": 355,
+      "id": "operator_knowledge_operator___$$___rag___$$___v1_0",
+      "position": {
+        "x": 559.598036509251,
+        "y": -466.1577905522121,
+        "zoom": 0.0
+      },
+      "type": "customNode",
+      "data": {
+        "label": "Knowledge Operator",
+        "name": "knowledge_operator",
+        "description": "The knowledge operator, which can create knowledge from datasource.",
+        "category": "rag",
+        "category_label": "RAG",
+        "flow_type": "operator",
+        "icon": null,
+        "documentation_url": "https://github.com/openai/openai-python",
+        "id": "operator_knowledge_operator___$$___rag___$$___v1_0",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Default datasource",
+            "name": "datasource",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "Default datasource.",
+            "options": null,
+            "value": null
+          },
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Knowledge type",
+            "name": "knowledge_type",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "DOCUMENT",
+            "placeholder": null,
+            "description": "Knowledge type.",
+            "options": [
+              {
+                "label": "DOCUMENT",
+                "name": "DOCUMENT",
+                "value": "DOCUMENT"
+              },
+              {
+                "label": "URL",
+                "name": "URL",
+                "value": "URL"
+              },
+              {
+                "label": "TEXT",
+                "name": "TEXT",
+                "value": "TEXT"
+              }
+            ],
+            "value": "URL"
+          }
+        ],
+        "operator_type": "map",
+        "inputs": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "knowledge datasource",
+            "name": "knowledge datasource",
+            "description": "knowledge datasource, which can be a document, url, or text.",
+            "is_list": false
+          }
+        ],
+        "outputs": [
+          {
+            "type_name": "Knowledge",
+            "type_cls": "dbgpt.rag.knowledge.base.Knowledge",
+            "label": "Knowledge",
+            "name": "Knowledge",
+            "description": "Knowledge object.",
+            "is_list": false
+          }
+        ],
+        "version": "v1",
+        "type_name": "KnowledgeOperator",
+        "type_cls": "dbgpt.rag.operators.knowledge.KnowledgeOperator"
+      },
+      "position_absolute": {
+        "x": 559.598036509251,
+        "y": -466.1577905522121,
+        "zoom": 0.0
+      }
+    },
+    {
+      "width": 288,
+      "height": 297,
+      "id": "operator_embedding_assembler_operator___$$___rag___$$___v1_0",
+      "position": {
+        "x": 1026.8635158835045,
+        "y": -160.59356493612583,
+        "zoom": 0.0
+      },
+      "type": "customNode",
+      "data": {
+        "label": "Embedding Assembler Operator",
+        "name": "embedding_assembler_operator",
+        "description": "Load knowledge and assemble embedding chunks to vector store.",
+        "category": "rag",
+        "category_label": "RAG",
+        "flow_type": "operator",
+        "icon": null,
+        "documentation_url": null,
+        "id": "operator_embedding_assembler_operator___$$___rag___$$___v1_0",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "VectorStoreConnector",
+            "type_cls": "dbgpt.storage.vector_store.connector.VectorStoreConnector",
+            "label": "Vector Store Connector",
+            "name": "vector_store_connector",
+            "is_list": false,
+            "category": "resource",
+            "resource_type": "instance",
+            "optional": false,
+            "default": null,
+            "placeholder": null,
+            "description": "The vector store connector.",
+            "options": null,
+            "value": "resource_dbgpt.storage.vector_store.connector.VectorStoreConnector_0"
+          },
+          {
+            "type_name": "ChunkParameters",
+            "type_cls": "dbgpt.rag.chunk_manager.ChunkParameters",
+            "label": "Chunk Parameters",
+            "name": "chunk_parameters",
+            "is_list": false,
+            "category": "resource",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The chunk parameters.",
+            "options": null,
+            "value": null
+          }
+        ],
+        "operator_type": "map",
+        "inputs": [
+          {
+            "type_name": "Knowledge",
+            "type_cls": "dbgpt.rag.knowledge.base.Knowledge",
+            "label": "Knowledge",
+            "name": "knowledge",
+            "description": "The knowledge to be loaded.",
+            "is_list": false
+          }
+        ],
+        "outputs": [
+          {
+            "type_name": "Chunk",
+            "type_cls": "dbgpt.core.interface.knowledge.Chunk",
+            "label": "Chunks",
+            "name": "chunks",
+            "description": "The assembled chunks, it has been persisted to vector store.",
+            "is_list": true
+          }
+        ],
+        "version": "v1",
+        "type_name": "EmbeddingAssemblerOperator",
+        "type_cls": "dbgpt.rag.operators.embedding.EmbeddingAssemblerOperator"
+      },
+      "position_absolute": {
+        "x": 1026.8635158835045,
+        "y": -160.59356493612583,
+        "zoom": 0.0
+      }
+    },
+    {
+      "width": 288,
+      "height": 255,
+      "id": "resource_dbgpt.storage.vector_store.connector.VectorStoreConnector_0",
+      "position": {
+        "x": 526.6454090221408,
+        "y": 41.035716372678806,
+        "zoom": 0.0
+      },
+      "type": "customNode",
+      "data": {
+        "type_name": "VectorStoreConnector",
+        "type_cls": "dbgpt.storage.vector_store.connector.VectorStoreConnector",
+        "label": "Vector Store Connector",
+        "name": "vector_store_connector",
+        "description": "The connector for vector store.\n\n    VectorStoreConnector, can connect different vector db provided load document api_v1\n    and similar search api_v1.\n\n    1.load_document:knowledge document source into vector store.(Chroma, Milvus,\n    Weaviate).\n    2.similar_search: similarity search from vector_store.\n    3.similar_search_with_scores: similarity search with similarity score from\n    vector_store\n\n    code example:\n    >>> from dbgpt.storage.vector_store.connector import VectorStoreConnector\n\n    >>> vector_store_config = VectorStoreConfig\n    >>> vector_store_connector = VectorStoreConnector(vector_store_type=\"Chroma\")\n    ",
+        "category": "vector_store",
+        "category_label": "Vector Store",
+        "flow_type": "resource",
+        "icon": null,
+        "documentation_url": null,
+        "id": "resource_dbgpt.storage.vector_store.connector.VectorStoreConnector_0",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Vector Store Type",
+            "name": "vector_store_type",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": false,
+            "default": null,
+            "placeholder": null,
+            "description": "The type of vector store.",
+            "options": [
+              {
+                "label": "Chroma",
+                "name": "Chroma",
+                "value": "Chroma"
+              },
+              {
+                "label": "Milvus",
+                "name": "Milvus",
+                "value": "Milvus"
+              },
+              {
+                "label": "Weaviate",
+                "name": "Weaviate",
+                "value": "Weaviate"
+              },
+              {
+                "label": "PGVector",
+                "name": "PGVector",
+                "value": "PGVector"
+              }
+            ],
+            "value": "Chroma"
+          },
+          {
+            "type_name": "VectorStoreConfig",
+            "type_cls": "dbgpt.storage.vector_store.base.VectorStoreConfig",
+            "label": "Vector Store Implementation",
+            "name": "vector_store_config",
+            "is_list": false,
+            "category": "resource",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The vector store implementation.",
+            "options": null,
+            "value": "resource_dbgpt.storage.vector_store.chroma_store.ChromaVectorConfig_0"
+          }
+        ],
+        "resource_type": "instance",
+        "parent_cls": [
+          "dbgpt.storage.vector_store.connector.VectorStoreConnector"
+        ]
+      },
+      "position_absolute": {
+        "x": 526.6454090221408,
+        "y": 41.035716372678806,
+        "zoom": 0.0
+      }
+    },
+    {
+      "width": 288,
+      "height": 594,
+      "id": "resource_dbgpt.storage.vector_store.chroma_store.ChromaVectorConfig_0",
+      "position": {
+        "x": 97.28282325200126,
+        "y": -50.889725800257615,
+        "zoom": 0.0
+      },
+      "type": "customNode",
+      "data": {
+        "type_name": "ChromaVectorConfig",
+        "type_cls": "dbgpt.storage.vector_store.chroma_store.ChromaVectorConfig",
+        "label": "Chroma Vector Store",
+        "name": "chroma_vector_store",
+        "description": "Chroma vector store.",
+        "category": "vector_store",
+        "category_label": "Vector Store",
+        "flow_type": "resource",
+        "icon": null,
+        "documentation_url": null,
+        "id": "resource_dbgpt.storage.vector_store.chroma_store.ChromaVectorConfig_0",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Collection Name",
+            "name": "name",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "dbgpt_collection",
+            "placeholder": null,
+            "description": "The name of vector store, if not set, will use the default name.",
+            "options": null,
+            "value": "my_awel_flow_vector"
+          },
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "User",
+            "name": "user",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The user of vector store, if not set, will use the default user.",
+            "options": null,
+            "value": null
+          },
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Password",
+            "name": "password",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The password of vector store, if not set, will use the default password.",
+            "options": null,
+            "value": null
+          },
+          {
+            "type_name": "Embeddings",
+            "type_cls": "dbgpt.core.interface.embeddings.Embeddings",
+            "label": "Embedding Function",
+            "name": "embedding_fn",
+            "is_list": false,
+            "category": "resource",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The embedding function of vector store, if not set, will use the default embedding function.",
+            "options": null,
+            "value": "resource_dbgpt.rag.embedding.embedding_factory.DefaultEmbeddings_0"
+          },
+          {
+            "type_name": "int",
+            "type_cls": "builtins.int",
+            "label": "Max Chunks Once Load",
+            "name": "max_chunks_once_load",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "10",
+            "placeholder": null,
+            "description": "The max number of chunks to load at once. If your document is large, you can set this value to a larger number to speed up the loading process. Default is 10.",
+            "options": null,
+            "value": null
+          },
+          {
+            "type_name": "int",
+            "type_cls": "builtins.int",
+            "label": "Max Threads",
+            "name": "max_threads",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "1",
+            "placeholder": null,
+            "description": "The max number of threads to use. Default is 1. If you set this bigger than 1, please make sure your vector store is thread-safe.",
+            "options": null,
+            "value": null
+          },
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Persist Path",
+            "name": "persist_path",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "the persist path of vector store.",
+            "options": null,
+            "value": null
+          }
+        ],
+        "resource_type": "instance",
+        "parent_cls": [
+          "dbgpt.storage.vector_store.chroma_store.ChromaVectorConfig",
+          "dbgpt.storage.vector_store.base.VectorStoreConfig",
+          "pydantic.main.BaseModel",
+          "pydantic.utils.Representation"
+        ]
+      },
+      "position_absolute": {
+        "x": 97.28282325200126,
+        "y": -50.889725800257615,
+        "zoom": 0.0
+      }
+    },
+    {
+      "width": 288,
+      "height": 116,
+      "id": "resource_dbgpt.rag.embedding.embedding_factory.DefaultEmbeddings_0",
+      "position": {
+        "x": -377.6005022294264,
+        "y": 315.2100161741173,
+        "zoom": 0.0
+      },
+      "type": "customNode",
+      "data": {
+        "type_name": "DefaultEmbeddings",
+        "type_cls": "dbgpt.rag.embedding.embedding_factory.DefaultEmbeddings",
+        "label": "Default Embeddings",
+        "name": "default_embedding_factory",
+        "description": "Default embeddings(using default embedding model of current system)",
+        "category": "embeddings",
+        "category_label": "Embeddings",
+        "flow_type": "resource",
+        "icon": null,
+        "documentation_url": null,
+        "id": "resource_dbgpt.rag.embedding.embedding_factory.DefaultEmbeddings_0",
+        "tags": null,
+        "parameters": [],
+        "resource_type": "instance",
+        "parent_cls": [
+          "dbgpt.rag.embedding.embedding_factory.DefaultEmbeddings",
+          "dbgpt.core.interface.embeddings.Embeddings"
+        ]
+      },
+      "position_absolute": {
+        "x": -377.6005022294264,
+        "y": 315.2100161741173,
+        "zoom": 0.0
+      }
+    },
+    {
+      "width": 288,
+      "height": 497,
+      "id": "operator_common_llm_http_trigger___$$___trigger___$$___v1_0",
+      "position": {
+        "x": -412.23851747524316,
+        "y": -324.0579200486623,
+        "zoom": 0.0
+      },
+      "type": "customNode",
+      "data": {
+        "label": "Common LLM Http Trigger",
+        "name": "common_llm_http_trigger",
+        "description": "Trigger your workflow by http request, and parse the request body as a common LLM http body",
+        "category": "trigger",
+        "category_label": "Trigger",
+        "flow_type": "operator",
+        "icon": null,
+        "documentation_url": null,
+        "id": "operator_common_llm_http_trigger___$$___trigger___$$___v1_0",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "API Endpoint",
+            "name": "endpoint",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": false,
+            "default": null,
+            "placeholder": null,
+            "description": "The API endpoint",
+            "options": null,
+            "value": "/awe/flow/rag/save_url_to_vstore"
+          },
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Http Methods",
+            "name": "methods",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "POST",
+            "placeholder": null,
+            "description": "The methods of the API endpoint",
+            "options": [
+              {
+                "label": "HTTP Method PUT",
+                "name": "http_put",
+                "value": "PUT"
+              },
+              {
+                "label": "HTTP Method POST",
+                "name": "http_post",
+                "value": "POST"
+              }
+            ],
+            "value": null
+          },
+          {
+            "type_name": "bool",
+            "type_cls": "builtins.bool",
+            "label": "Streaming Response",
+            "name": "streaming_response",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "False",
+            "placeholder": null,
+            "description": "Whether the response is streaming",
+            "options": null,
+            "value": null
+          },
+          {
+            "type_name": "BaseHttpBody",
+            "type_cls": "dbgpt.core.awel.trigger.http_trigger.BaseHttpBody",
+            "label": "Http Response Body",
+            "name": "http_response_body",
+            "is_list": false,
+            "category": "resource",
+            "resource_type": "class",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The response body of the API endpoint",
+            "options": null,
+            "value": null
+          },
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Response Media Type",
+            "name": "response_media_type",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The response media type",
+            "options": null,
+            "value": null
+          },
+          {
+            "type_name": "int",
+            "type_cls": "builtins.int",
+            "label": "Http Status Code",
+            "name": "status_code",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "200",
+            "placeholder": null,
+            "description": "The http status code",
+            "options": null,
+            "value": null
+          }
+        ],
+        "operator_type": "input",
+        "inputs": [],
+        "outputs": [
+          {
+            "type_name": "CommonLLMHttpRequestBody",
+            "type_cls": "dbgpt.core.awel.trigger.http_trigger.CommonLLMHttpRequestBody",
+            "label": "Request Body",
+            "name": "request_body",
+            "description": "The request body of the API endpoint, parse as a common LLM http body",
+            "is_list": false
+          }
+        ],
+        "version": "v1",
+        "type_name": "CommonLLMHttpTrigger",
+        "type_cls": "dbgpt.core.awel.trigger.http_trigger.CommonLLMHttpTrigger"
+      },
+      "position_absolute": {
+        "x": -412.23851747524316,
+        "y": -324.0579200486623,
+        "zoom": 0.0
+      }
+    },
+    {
+      "width": 288,
+      "height": 287,
+      "id": "operator_request_body_to_str__parsed_operator___$$___common___$$___v1_0",
+      "position": {
+        "x": 16.725868091350435,
+        "y": -427.27643739087404,
+        "zoom": 0.0
+      },
+      "type": "customNode",
+      "data": {
+        "label": "Request Body Parsed To String Operator",
+        "name": "request_body_to_str__parsed_operator",
+        "description": "User input parsed operator, parse the user input from request body and return as a string",
+        "category": "common",
+        "category_label": "Common",
+        "flow_type": "operator",
+        "icon": null,
+        "documentation_url": null,
+        "id": "operator_request_body_to_str__parsed_operator___$$___common___$$___v1_0",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Key",
+            "name": "key",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "messages",
+            "placeholder": null,
+            "description": "The key of the dict, link 'user_input'",
+            "options": null,
+            "value": null
+          }
+        ],
+        "operator_type": "map",
+        "inputs": [
+          {
+            "type_name": "CommonLLMHttpRequestBody",
+            "type_cls": "dbgpt.core.awel.trigger.http_trigger.CommonLLMHttpRequestBody",
+            "label": "Request Body",
+            "name": "request_body",
+            "description": "The request body of the API endpoint",
+            "is_list": false
+          }
+        ],
+        "outputs": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "User Input String",
+            "name": "user_input_str",
+            "description": "The user input dict of the API endpoint",
+            "is_list": false
+          }
+        ],
+        "version": "v1",
+        "type_name": "RequestedParsedOperator",
+        "type_cls": "dbgpt.core.awel.trigger.http_trigger.RequestedParsedOperator"
+      },
+      "position_absolute": {
+        "x": 16.725868091350435,
+        "y": -427.27643739087404,
+        "zoom": 0.0
+      }
+    },
+    {
+      "width": 288,
+      "height": 287,
+      "id": "operator_chunks_to_string_operator___$$___rag___$$___v1_0",
+      "position": {
+        "x": 1494.4448893152282,
+        "y": 24.144613267532492,
+        "zoom": 0.0
+      },
+      "type": "customNode",
+      "data": {
+        "label": "Chunks To String Operator",
+        "name": "chunks_to_string_operator",
+        "description": "Convert chunks to string.",
+        "category": "rag",
+        "category_label": "RAG",
+        "flow_type": "operator",
+        "icon": null,
+        "documentation_url": null,
+        "id": "operator_chunks_to_string_operator___$$___rag___$$___v1_0",
+        "tags": null,
+        "parameters": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "Separator",
+            "name": "separator",
+            "is_list": false,
+            "category": "common",
+            "resource_type": "instance",
+            "optional": true,
+            "default": "\n",
+            "placeholder": null,
+            "description": "The separator between chunks.",
+            "options": null,
+            "value": "\\n"
+          }
+        ],
+        "operator_type": "map",
+        "inputs": [
+          {
+            "type_name": "Chunk",
+            "type_cls": "dbgpt.core.interface.knowledge.Chunk",
+            "label": "Chunks",
+            "name": "chunks",
+            "description": "The input chunks.",
+            "is_list": true
+          }
+        ],
+        "outputs": [
+          {
+            "type_name": "str",
+            "type_cls": "builtins.str",
+            "label": "String",
+            "name": "string",
+            "description": "The output string.",
+            "is_list": false
+          }
+        ],
+        "version": "v1",
+        "type_name": "ChunksToStringOperator",
+        "type_cls": "dbgpt.rag.operators.knowledge.ChunksToStringOperator"
+      },
+      "position_absolute": {
+        "x": 1494.4448893152282,
+        "y": 24.144613267532492,
+        "zoom": 0.0
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "operator_knowledge_operator___$$___rag___$$___v1_0",
+      "source_order": 0,
+      "target": "operator_embedding_assembler_operator___$$___rag___$$___v1_0",
+      "target_order": 0,
+      "id": "operator_knowledge_operator___$$___rag___$$___v1_0|operator_embedding_assembler_operator___$$___rag___$$___v1_0",
+      "source_handle": "operator_knowledge_operator___$$___rag___$$___v1_0|outputs|0",
+      "target_handle": "operator_embedding_assembler_operator___$$___rag___$$___v1_0|inputs|0",
+      "type": "buttonedge"
+    },
+    {
+      "source": "resource_dbgpt.storage.vector_store.connector.VectorStoreConnector_0",
+      "source_order": 0,
+      "target": "operator_embedding_assembler_operator___$$___rag___$$___v1_0",
+      "target_order": 0,
+      "id": "resource_dbgpt.storage.vector_store.connector.VectorStoreConnector_0|operator_embedding_assembler_operator___$$___rag___$$___v1_0",
+      "source_handle": "resource_dbgpt.storage.vector_store.connector.VectorStoreConnector_0|outputs|0",
+      "target_handle": "operator_embedding_assembler_operator___$$___rag___$$___v1_0|parameters|0",
+      "type": "buttonedge"
+    },
+    {
+      "source": "resource_dbgpt.storage.vector_store.chroma_store.ChromaVectorConfig_0",
+      "source_order": 0,
+      "target": "resource_dbgpt.storage.vector_store.connector.VectorStoreConnector_0",
+      "target_order": 1,
+      "id": "resource_dbgpt.storage.vector_store.chroma_store.ChromaVectorConfig_0|resource_dbgpt.storage.vector_store.connector.VectorStoreConnector_0",
+      "source_handle": "resource_dbgpt.storage.vector_store.chroma_store.ChromaVectorConfig_0|outputs|0",
+      "target_handle": "resource_dbgpt.storage.vector_store.connector.VectorStoreConnector_0|parameters|1",
+      "type": "buttonedge"
+    },
+    {
+      "source": "resource_dbgpt.rag.embedding.embedding_factory.DefaultEmbeddings_0",
+      "source_order": 0,
+      "target": "resource_dbgpt.storage.vector_store.chroma_store.ChromaVectorConfig_0",
+      "target_order": 3,
+      "id": "resource_dbgpt.rag.embedding.embedding_factory.DefaultEmbeddings_0|resource_dbgpt.storage.vector_store.chroma_store.ChromaVectorConfig_0",
+      "source_handle": "resource_dbgpt.rag.embedding.embedding_factory.DefaultEmbeddings_0|outputs|0",
+      "target_handle": "resource_dbgpt.storage.vector_store.chroma_store.ChromaVectorConfig_0|parameters|3",
+      "type": "buttonedge"
+    },
+    {
+      "source": "operator_request_body_to_str__parsed_operator___$$___common___$$___v1_0",
+      "source_order": 0,
+      "target": "operator_knowledge_operator___$$___rag___$$___v1_0",
+      "target_order": 0,
+      "id": "operator_request_body_to_str__parsed_operator___$$___common___$$___v1_0|operator_knowledge_operator___$$___rag___$$___v1_0",
+      "source_handle": "operator_request_body_to_str__parsed_operator___$$___common___$$___v1_0|outputs|0",
+      "target_handle": "operator_knowledge_operator___$$___rag___$$___v1_0|inputs|0",
+      "type": "buttonedge"
+    },
+    {
+      "source": "operator_common_llm_http_trigger___$$___trigger___$$___v1_0",
+      "source_order": 0,
+      "target": "operator_request_body_to_str__parsed_operator___$$___common___$$___v1_0",
+      "target_order": 0,
+      "id": "operator_common_llm_http_trigger___$$___trigger___$$___v1_0|operator_request_body_to_str__parsed_operator___$$___common___$$___v1_0",
+      "source_handle": "operator_common_llm_http_trigger___$$___trigger___$$___v1_0|outputs|0",
+      "target_handle": "operator_request_body_to_str__parsed_operator___$$___common___$$___v1_0|inputs|0",
+      "type": "buttonedge"
+    },
+    {
+      "source": "operator_embedding_assembler_operator___$$___rag___$$___v1_0",
+      "source_order": 0,
+      "target": "operator_chunks_to_string_operator___$$___rag___$$___v1_0",
+      "target_order": 0,
+      "id": "operator_embedding_assembler_operator___$$___rag___$$___v1_0|operator_chunks_to_string_operator___$$___rag___$$___v1_0",
+      "source_handle": "operator_embedding_assembler_operator___$$___rag___$$___v1_0|outputs|0",
+      "target_handle": "operator_chunks_to_string_operator___$$___rag___$$___v1_0|inputs|0",
+      "type": "buttonedge"
+    }
+  ],
+  "viewport": {
+    "x": 504.05228467534994,
+    "y": 597.0769235916715,
+    "zoom": 0.9596331309447858
+  }
+}
