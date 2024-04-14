@@ -1,0 +1,11 @@
+[agent]
+label = "Summarizer Agent Example"
+name = "summarizer_agent_example"
+version = "0.1.0"
+description = ""
+authors = []
+definition_type = "python"
+
+[python_config]
+
+[json_config]
