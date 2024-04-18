@@ -31,7 +31,7 @@ CHECK_RESULT_SYSTEM_MESSAGE = (
 
 class MySummarizerAgent(ConversableAgent):
     # The name of the agent
-    name = "Aristotle"
+    name: str = "Aristotle"
     # The profile of the agent
     profile: str = "MySummarizer"
     # The core functional goals of the agent tell LLM what it can do with it.

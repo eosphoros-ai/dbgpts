@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "summarizer-agent-example"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Fangyin Cheng <staneyffer@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-dbgpt = {extras = ["agent"], version = "^0.5.4"}
+dbgpt = {extras = ["agent"], version = "^0.5.5rc0"}
 
 [build-system]
 requires = ["poetry-core"]
