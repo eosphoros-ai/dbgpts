@@ -7,10 +7,7 @@ An implementation of `Write Your Custom Agent
 import asyncio
 from typing import Any, Dict, Optional, Tuple
 
-from dbgpt.agent import (
-    AgentMessage,
-    ConversableAgent,
-)
+from dbgpt.agent import AgentMessage, ConversableAgent, ProfileConfig
 from dbgpt.core import ModelMessageRoleType
 
 from .action import SummaryAction, NOT_RELATED_MESSAGE
@@ -30,36 +27,37 @@ CHECK_RESULT_SYSTEM_MESSAGE = (
 
 
 class MySummarizerAgent(ConversableAgent):
-    # The name of the agent
-    name: str = "Aristotle"
-    # The profile of the agent
-    profile: str = "MySummarizer"
-    # The core functional goals of the agent tell LLM what it can do with it.
-    goal: str = (
-        "Summarize answer summaries based on user questions from provided "
-        "resource information or from historical conversation memories."
+    profile: ProfileConfig = ProfileConfig(
+        # The name of the agent
+        name="Aristotle",
+        # The role of the agent
+        role="MySummarizer",
+        # The core functional goals of the agent tell LLM what it can do with it.
+        goal=(
+            "Summarize answer summaries based on user questions from provided "
+            "resource information or from historical conversation memories."
+        ),
+        # Introduction and description of the agent, used for task assignment and
+        # display. If it is empty, the goal content will be used.
+        desc=(
+            "You can summarize provided text content according to user's questions"
+            " and output the summarization."
+        ),
+        constraints=[
+            "Prioritize the summary of answers to user questions from the improved "
+            "resource text. If no relevant information is found, summarize it from "
+            "the historical dialogue memory given. It is forbidden to make up your "
+            "own.",
+            "You need to first detect user's question that you need to answer with your"
+            " summarization.",
+            "Extract the provided text content used for summarization.",
+            "Then you need to summarize the extracted text content.",
+            "Output the content of summarization ONLY related to user's question. The "
+            "output language must be the same to user's question language.",
+            "If you think the provided text content is not related to user questions "
+            "at all, ONLY output '{{ not_related_message }}'!!.",
+        ],
     )
-    # Introduction and description of the agent, used for task assignment and display.
-    # If it is empty, the goal content will be used.
-    desc: str = (
-        "You can summarize provided text content according to user's questions"
-        " and output the summarization."
-    )
-    # Refer to the following. It can contain multiple constraints and reasoning
-    # restriction logic, and supports the use of parameter template {param_name}.
-    constraints: list[str] = [
-        "Prioritize the summary of answers to user questions from the improved resource"
-        " text. If no relevant information is found, summarize it from the historical "
-        "dialogue memory given. It is forbidden to make up your own.",
-        "You need to first detect user's question that you need to answer with your"
-        " summarization.",
-        "Extract the provided text content used for summarization.",
-        "Then you need to summarize the extracted text content.",
-        "Output the content of summarization ONLY related to user's question. The "
-        "output language must be the same to user's question language.",
-        "If you think the provided text content is not related to user questions at "
-        "all, ONLY output '{not_related_message}'!!.",
-    ]
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -123,22 +121,22 @@ class MySummarizerAgent(ConversableAgent):
 async def _test_agent():
     """Test the summarizer agent."""
     from dbgpt.model.proxy import OpenAILLMClient
-    from dbgpt.agent import AgentContext, GptsMemory, UserProxyAgent, LLMConfig
+    from dbgpt.agent import AgentContext, AgentMemory, UserProxyAgent, LLMConfig
 
     llm_client = OpenAILLMClient(model_alias="gpt-3.5-turbo")
     context: AgentContext = AgentContext(conv_id="summarize")
 
-    default_memory: GptsMemory = GptsMemory()
+    agent_memory: AgentMemory = AgentMemory()
 
     summarizer = (
         await MySummarizerAgent()
         .bind(context)
         .bind(LLMConfig(llm_client=llm_client))
-        .bind(default_memory)
+        .bind(agent_memory)
         .build()
     )
 
-    user_proxy = await UserProxyAgent().bind(default_memory).bind(context).build()
+    user_proxy = await UserProxyAgent().bind(agent_memory).bind(context).build()
 
     await user_proxy.initiate_chat(
         recipient=summarizer,
@@ -163,7 +161,7 @@ async def _test_agent():
             Nuclear electric rocket
             """,
     )
-    print(await default_memory.one_chat_completions("summarize"))
+    print(await agent_memory.gpts_memory.one_chat_completions("summarize"))
 
 
 if __name__ == "__main__":
