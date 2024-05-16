@@ -6,6 +6,7 @@ This repo will contains some data apps、AWEL operators、AWEL workflow template
 - [workflow](/workflow)
 - [agents](/agents)
 - [operators](/operators)
+- [resources](/resources)
 
 ## Quick Start
 At first you need to install [DB-GPT](https://docs.dbgpt.site/docs/quickstart) project.
