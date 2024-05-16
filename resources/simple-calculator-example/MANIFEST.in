@@ -1,0 +1,2 @@
+include dbgpts.toml
+include simple_calculator_example/definition/*.json
