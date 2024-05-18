@@ -1,0 +1,2 @@
+include dbgpts.toml
+include jina_web_reader/definition/*.json
