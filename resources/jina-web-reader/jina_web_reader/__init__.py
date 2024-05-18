@@ -1,4 +1,4 @@
-"""A custom resource module that provides a simple tool to send GET requests."""
+"""A tool for searching and crawling the web using Jina."""
 
 import aiohttp
 import os
