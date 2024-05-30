@@ -36,7 +36,7 @@ class SimpleHelloWorldOperator(MapOperator[str, str]):
                 str,
                 description="The output value after saying hello",
             )
-        ]
+        ],
     )
 
     def __init__(self, name: str = "World", **kwargs):
