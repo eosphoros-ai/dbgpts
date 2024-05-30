@@ -1,0 +1,2 @@
+include dbgpts.toml
+include all_in_one_entrance/definition/*.json
