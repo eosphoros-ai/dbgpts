@@ -277,7 +277,7 @@ class FinalJoinOperator(JoinOperator[str]):
         super().__init__(join_func, **kwargs)
 
 
-with DAG("IntentDetection") as dag:
+with DAG("dbgpts_all_in_one_entrance_intent_detection_dag") as dag:
     trigger = CommonLLMHttpTrigger(
         "/dbgpts/all-in-one-entrance",
         methods="POST",
