@@ -1,0 +1,2 @@
+include dbgpts.toml
+include andrewyng_translation_agent/definition/*.json
