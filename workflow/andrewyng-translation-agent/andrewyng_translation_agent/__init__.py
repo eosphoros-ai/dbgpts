@@ -1413,7 +1413,12 @@ class TranslationJoinOperator(JoinOperator[str]):
     )
 
     def __init__(self, **kwargs):
-        JoinOperator.__init__(self, combine_function=self.no_empty_data, **kwargs)
+        JoinOperator.__init__(
+            self,
+            combine_function=self.no_empty_data,
+            can_skip_in_branch=False,
+            **kwargs,
+        )
 
     async def no_empty_data(
         self, one_chunk_result: Optional[str], multi_chunk_result: Optional[str]
