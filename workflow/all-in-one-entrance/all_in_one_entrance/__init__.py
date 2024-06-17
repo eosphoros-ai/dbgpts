@@ -274,7 +274,7 @@ class FinalJoinOperator(JoinOperator[str]):
     )
 
     def __init__(self, **kwargs):
-        super().__init__(join_func, **kwargs)
+        super().__init__(join_func, can_skip_in_branch=False, **kwargs)
 
 
 with DAG("dbgpts_all_in_one_entrance_intent_detection_dag") as dag:

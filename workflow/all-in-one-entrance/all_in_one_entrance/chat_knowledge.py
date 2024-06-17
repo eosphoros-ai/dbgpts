@@ -53,7 +53,7 @@ class ChatKnowledgeOperator(MapOperator[ModelRequest, ModelRequest]):
             "embedding_factory", EmbeddingFactory
         )
         from dbgpt.rag.retriever.embedding import EmbeddingRetriever
-        from dbgpt.storage.vector_store.connector import VectorStoreConnector
+        from dbgpt.serve.rag.connector import VectorStoreConnector
 
         embedding_fn = embedding_factory.create(
             model_name=EMBEDDING_MODEL_CONFIG[cfg.EMBEDDING_MODEL]
@@ -68,7 +68,7 @@ class ChatKnowledgeOperator(MapOperator[ModelRequest, ModelRequest]):
         )
         embedding_retriever = EmbeddingRetriever(
             top_k=5,
-            vector_store_connector=vector_store_connector,
+            index_store=vector_store_connector.client,
         )
         chunks = await embedding_retriever.aretrieve_with_scores(user_input, 0.3)
         context = "\n".join([doc.content for doc in chunks])
