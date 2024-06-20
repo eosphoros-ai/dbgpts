@@ -1,0 +1,13 @@
+[tool.poetry]
+name = "rag-save-url-to-vstore"
+version = "0.1.0"
+description = "Parse the web page in the URL and load it into the vector store."
+authors = ["Fangyin Cheng <staneyffer@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

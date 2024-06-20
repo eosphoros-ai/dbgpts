@@ -1,0 +1,11 @@
+[resource]
+label = "Simple Calculator Example"
+name = "simple_calculator_example"
+version = "0.1.0"
+description = "A simple calculator tool example"
+authors = []
+definition_type = "python"
+
+[python_config]
+
+[json_config]

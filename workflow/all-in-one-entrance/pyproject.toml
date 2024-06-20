@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "all-in-one-entrance"
+version = "0.1.0"
+description = "A chatbot based on intent recognition and slot filling as a entrance to all other chatbots."
+authors = ["Fangyin Cheng <staneyffer@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

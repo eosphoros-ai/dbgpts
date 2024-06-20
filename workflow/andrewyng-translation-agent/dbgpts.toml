@@ -1,0 +1,12 @@
+[flow]
+label = "Andrewyng Translation Agent"
+name = "andrewyng_translation_agent"
+version = "0.1.0"
+description = "Implementation of Andrewyng Translation Agent: https://github.com/andrewyng/translation-agent"
+authors = []
+definition_type = "python"
+
+[python_config]
+
+[json_config]
+file_path = "definition/flow_definition.json"
