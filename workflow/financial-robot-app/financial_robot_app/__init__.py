@@ -2,7 +2,6 @@
 from typing import List
 
 from dbgpt._private.config import Config
-from dbgpt.app.scene.chat_knowledge.financial import FinReportJoinOperator
 from dbgpt.component import ComponentType
 from dbgpt.core import ModelMessage, ModelRequest, StorageInterface, InMemoryStorage, \
     StorageConversation, BaseMessage
@@ -92,6 +91,10 @@ class FinChatJoinOperator(JoinOperator[str]):
         ],
     )
 
+    def __init__(self, **kwargs):
+        """Create a new FinReportJoinOperator."""
+        super().__init__(join_func, can_skip_in_branch=False, **kwargs)
+
 
 with DAG("fin_report_assistant_example") as dag:
     trigger = CommonLLMHttpTrigger(
@@ -131,7 +134,7 @@ with DAG("fin_report_assistant_example") as dag:
     )
     chat_knowledge_task = ChatKnowledgeOperator()
     stream_llm_task = StreamingLLMOperator(llm_client)
-    join_task = FinReportJoinOperator()
+    join_task = FinChatJoinOperator()
     # query classifier
     trigger >> request_handle_task >> fin_intent_task >> query_classifier >> classifier_branch
     # chat database branch
