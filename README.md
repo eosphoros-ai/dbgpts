@@ -76,7 +76,7 @@ dbgpt app list
 ### Install a dbgpts from official repository
 
 ```bash
-dbgpt app install awel-flow-simple-streaming-chat
+dbgpt app install awel-flow-simple-streaming-chat -U
 ```
 
 ### View all dbgpts In DB-GPT
@@ -93,7 +93,7 @@ Like this:
 ### Chat With Your dbgpts.
 
 ```bash
-dbgpt run flow -n awel_flow_simple_streaming_chat \
+dbgpt run flow chat -n awel_flow_simple_streaming_chat \
 --model "chatgpt_proxyllm" \
 --stream \
 --messages 'Write a quick sort algorithm in Python.'
@@ -152,7 +152,7 @@ Commands:
   list-remote  List all available dbgpts
   uninstall    Uninstall your dbgpts(operators,agents,workflows or apps)
 ```
-Run `dbgpt run flow --help` to see more commands for running flows. The output will be like this:
+Run `dbgpt run flow chat --help` to see more commands for running flows. The output will be like this:
 ```bash
 Usage: dbgpt run flow [OPTIONS]
 
