@@ -1,0 +1,11 @@
+[flow]
+label = "Financial Report Knowledge Factory"
+name = "financial_robot_app"
+version = "0.1.0"
+description = "Financial Report chat robot."
+authors = []
+definition_type = "python"
+
+[python_config]
+
+[json_config]

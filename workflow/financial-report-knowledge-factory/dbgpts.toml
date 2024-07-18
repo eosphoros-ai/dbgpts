@@ -1,0 +1,11 @@
+[flow]
+label = "Financial Report Knowledge Factory"
+name = "financial_report_knowledge_factory"
+version = "0.1.0"
+description = "A knowledge factory for financial reports."
+authors = []
+definition_type = "python"
+
+[python_config]
+
+[json_config]
