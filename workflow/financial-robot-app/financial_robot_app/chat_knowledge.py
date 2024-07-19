@@ -1,4 +1,5 @@
 """ChatKnowledgeOperator."""
+
 from typing import Optional
 
 from dbgpt._private.config import Config
@@ -50,7 +51,12 @@ professional and concise answers to their questions.
 class ChatKnowledgeOperator(MapOperator[ModelRequest, ModelRequest]):
     """ChatKnowledgeOperator."""
 
-    def __init__(self, task_name="chat_knowledge", intent: Optional[FinReportIntent] = None, **kwargs):
+    def __init__(
+        self,
+        task_name="chat_knowledge",
+        intent: Optional[FinReportIntent] = None,
+        **kwargs
+    ):
         """ChatKnowledgeOperator."""
         self._intent = intent
         self._knowledge_space = kwargs.pop("knowledge_space", None)
@@ -62,11 +68,10 @@ class ChatKnowledgeOperator(MapOperator[ModelRequest, ModelRequest]):
         from dbgpt.configs.model_config import EMBEDDING_MODEL_CONFIG
         from dbgpt.rag.embedding.embedding_factory import EmbeddingFactory
         from dbgpt.storage.vector_store.base import VectorStoreConfig
+
         user_input = input_value.messages[-1].content
         knowledge_name = self._knowledge_space or input_value.context.extra.get("space")
-        intent: FinReportIntent = input_value.context.extra.get(
-            "intent"
-        )
+        intent: FinReportIntent = input_value.context.extra.get("intent")
         hit_document_title, user_input, metadata_filter = self.get_fuzzy_match(
             user_input, intent
         )
@@ -126,22 +131,18 @@ class ChatKnowledgeOperator(MapOperator[ModelRequest, ModelRequest]):
         return request
 
     def get_fuzzy_match(self, user_input, intent):
-        """ fuzzy match for user input and get label filter"""
+        """fuzzy match for user input and get label filter"""
         knowledge_service = Service.get_instance(self._cfg.SYSTEM_APP)
-        document_list = knowledge_service.get_document_list({
-            "space": self._knowledge_space
-        }, page=1, page_size=1000)
+        document_list = knowledge_service.get_document_list(
+            {"space": self._knowledge_space}, page=1, page_size=1000
+        )
         document_titles = [document.doc_name for document in document_list.items]
         if intent.company and intent.company is not "":
             from fuzzywuzzy import process
 
-            best_match, confidence = process.extractOne(
-                intent.company, document_titles
-            )
+            best_match, confidence = process.extractOne(intent.company, document_titles)
             hit_title = best_match or intent.company
             user_input = intent.intent
-            filter = MetadataFilter(
-                key="title", value=hit_title.replace(".pdf", "")
-            )
+            filter = MetadataFilter(key="title", value=hit_title.replace(".pdf", ""))
             return hit_title, user_input, filter
         return None, user_input, None

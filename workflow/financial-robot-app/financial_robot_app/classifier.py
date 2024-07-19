@@ -1,4 +1,5 @@
 """The Question Classifier Operator."""
+
 from enum import Enum
 from typing import Dict, Optional
 

@@ -1,4 +1,5 @@
 """The ChatDatabaseOperator."""
+
 import json
 from typing import Optional
 
@@ -132,19 +133,17 @@ class ChatDataOperator(MapOperator[ModelRequest, ModelRequest]):
         self._intent = intent
         self._db_name = db_name
 
-
         super().__init__(task_name=task_name, **kwargs)
 
     async def map(self, input_value: ModelRequest) -> ModelRequest:
         """Map the input value to the output value."""
         from dbgpt.rag.summary.db_summary_client import DBSummaryClient
         from dbgpt.vis.tags.vis_chart import default_chart_type_prompt
+
         cfg = Config()
         self._db_name = input_value.get("db_name")
         self._intent = input_value.get("intent")
-        self._database = (
-                cfg.local_db_manager.get_connector(self._db_name)
-        )
+        self._database = cfg.local_db_manager.get_connector(self._db_name)
         company_df = self._database.run_to_df(f"select 公司名称_x from fin_report")
         self._company_list = [
             item[0] for item in company_df.values.tolist() if item is not None

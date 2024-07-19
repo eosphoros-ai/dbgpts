@@ -1,15 +1,23 @@
 """FinReportJoinOperator."""
+
 from typing import List
 
 from dbgpt._private.config import Config
 from dbgpt.component import ComponentType
-from dbgpt.core import ModelMessage, ModelRequest, StorageInterface, InMemoryStorage, \
-    StorageConversation, BaseMessage
+from dbgpt.core import (
+    ModelMessage,
+    ModelRequest,
+    StorageInterface,
+    InMemoryStorage,
+    StorageConversation,
+    BaseMessage,
+)
 from dbgpt.core.awel import (
     CommonLLMHttpRequestBody,
     JoinOperator,
     MapOperator,
-    is_empty_data, DAG
+    is_empty_data,
+    DAG,
 )
 from dbgpt.core.awel.flow import IOField, OperatorCategory, ViewMetadata
 from dbgpt.core.awel.trigger.http_trigger import CommonLLMHttpTrigger
@@ -18,7 +26,11 @@ from dbgpt.model import DefaultLLMClient
 from dbgpt.model.cluster import WorkerManagerFactory
 from dbgpt.model.operators import StreamingLLMOperator, LLMOperator
 
-from .chat_database import ChatDataOperator, ChatDatabaseChartOperator, ChatDatabaseOutputParserOperator
+from .chat_database import (
+    ChatDataOperator,
+    ChatDatabaseChartOperator,
+    ChatDatabaseOutputParserOperator,
+)
 from .chat_indicator import ChatIndicatorOperator
 from .chat_knowledge import ChatKnowledgeOperator
 from .classifier import QuestionClassifierOperator, QuestionClassifierBranchOperator
@@ -96,19 +108,20 @@ class FinChatJoinOperator(JoinOperator[str]):
         super().__init__(join_func, can_skip_in_branch=False, **kwargs)
 
 
-with DAG("fin_report_assistant_example") as dag:
+with DAG(
+    "fin_report_assistant_example",
+    tags={"knowledge_chat_domain_type": "FinancialReport"},
+) as dag:
     trigger = CommonLLMHttpTrigger(
         "/dbgpts/financial-robot-app",
         methods="POST",
         streaming_predict_func=lambda x: x.stream,
     )
     CFG = Config()
-    worker_manager_factory: WorkerManagerFactory = (
-        CFG.SYSTEM_APP.get_component(
-            ComponentType.WORKER_MANAGER_FACTORY,
-            WorkerManagerFactory,
-            default_component=None,
-        )
+    worker_manager_factory: WorkerManagerFactory = CFG.SYSTEM_APP.get_component(
+        ComponentType.WORKER_MANAGER_FACTORY,
+        WorkerManagerFactory,
+        default_component=None,
     )
     if worker_manager_factory:
         llm_client = DefaultLLMClient(worker_manager_factory.create())
@@ -136,25 +149,30 @@ with DAG("fin_report_assistant_example") as dag:
     stream_llm_task = StreamingLLMOperator(llm_client)
     join_task = FinChatJoinOperator()
     # query classifier
-    trigger >> request_handle_task >> fin_intent_task >> query_classifier >> classifier_branch
+    (
+        trigger
+        >> request_handle_task
+        >> fin_intent_task
+        >> query_classifier
+        >> classifier_branch
+    )
     # chat database branch
     (
-            classifier_branch
-            >> chat_data_task
-            >> llm_task
-            >> sql_parse_task
-            >> sql_chart_task
-            >> join_task
+        classifier_branch
+        >> chat_data_task
+        >> llm_task
+        >> sql_parse_task
+        >> sql_chart_task
+        >> join_task
     )
     # chat indicator branch
     (
-            classifier_branch
-            >> indicator_task
-            >> indicator_llm_task
-            >> indicator_sql_parse_task
-            >> indicator_sql_chart_task
-            >> join_task
+        classifier_branch
+        >> indicator_task
+        >> indicator_llm_task
+        >> indicator_sql_parse_task
+        >> indicator_sql_chart_task
+        >> join_task
     )
     # chat knowledge branch
     (classifier_branch >> chat_knowledge_task >> stream_llm_task >> join_task)
-

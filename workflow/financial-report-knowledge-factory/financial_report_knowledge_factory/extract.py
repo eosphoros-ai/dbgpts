@@ -1,4 +1,5 @@
 """FinTableExtractor."""
+
 import json
 import logging
 import os
@@ -26,7 +27,11 @@ class FinTableProcessor:
                 data = eval(line)
                 print(data)
                 # ignore页眉 and 页脚
-                if data and data["type"] not in ["页眉", "页脚"] and data["inside"] != "":
+                if (
+                    data
+                    and data["type"] not in ["页眉", "页脚"]
+                    and data["inside"] != ""
+                ):
                     self.all_data.append(data)
 
     def process_text_data(self):
@@ -251,7 +256,9 @@ class FinTableProcessor:
             except Exception:
                 # match column contains year, month, date.
                 logger.error(
-                    "Error: 文件<{}>中的表格<{}>有误，拆分处理".format(self.txt_path, table_name)
+                    "Error: 文件<{}>中的表格<{}>有误，拆分处理".format(
+                        self.txt_path, table_name
+                    )
                 )
                 pattern = r"\d{4}年\d{1,2}月\d{1,2}日"
                 # Iterate through the column names of the first row
@@ -358,7 +365,8 @@ class FinTableExtractor:
                             )
                             for _answer in answer_list:
                                 if not re.search(
-                                    "代码|股票|简称|交易所|A股|A 股|公司|上交所|科创版|名称", _answer
+                                    "代码|股票|简称|交易所|A股|A 股|公司|上交所|科创版|名称",
+                                    _answer,
                                 ) and _answer not in ["", " "]:
                                     short_name2 = _answer
                                     break
@@ -441,17 +449,26 @@ class FinTableExtractor:
                             chinese_name2, "'中文简称|中文简称'", False
                         )
                         english_name = check_answers(
-                            english_name, "'公司的外文名称|公司的外文名称(?:（如有）)？'", True
+                            english_name,
+                            "'公司的外文名称|公司的外文名称(?:（如有）)？'",
+                            True,
                         )
                         english_name2 = check_answers(
                             english_name2,
-                            "'公司的外文名称缩写|公司的外文名称缩写(?:（如有）)？" "" "" "'",
+                            "'公司的外文名称缩写|公司的外文名称缩写(?:（如有）)？"
+                            ""
+                            ""
+                            "'",
                             True,
                         )
                         web = check_answers(
-                            web, "'公司(?:国际互联网)?网址|公司(?:国际互联网)?网址'", True
+                            web,
+                            "'公司(?:国际互联网)?网址|公司(?:国际互联网)?网址'",
+                            True,
                         )
-                        boss = check_answers(boss, "'公司的法定代表人|公司的法定代表人'", False)
+                        boss = check_answers(
+                            boss, "'公司的法定代表人|公司的法定代表人'", False
+                        )
                         all_person = check_answers(
                             all_person,
                             "'(?:报告期末)?在职员工的数量合计(?:（人）)?|(?:报告期末)?在职员工"
@@ -860,7 +877,9 @@ class FinTableExtractor:
                         line_dict,
                         text5,
                     )
-                    if re.search("(?:负责人.{0,15}|6、)(?:母公司现金流量表)$", all_text):
+                    if re.search(
+                        "(?:负责人.{0,15}|6、)(?:母公司现金流量表)$", all_text
+                    ):
                         break
 
                 except Exception:
@@ -935,9 +954,13 @@ class FinTableExtractor:
                                 print(key)
                 return answer_dict
 
-            answer_dict = check_data(answer_dict, text1[cut1_len:], "12月31日", "合并资产负债表")
+            answer_dict = check_data(
+                answer_dict, text1[cut1_len:], "12月31日", "合并资产负债表"
+            )
             answer_dict = check_data(answer_dict, text3[cut3_len:], "度", "合并利润表")
-            answer_dict = check_data(answer_dict, text5[cut5_len:], "度", "合并现金流量表")
+            answer_dict = check_data(
+                answer_dict, text5[cut5_len:], "度", "合并现金流量表"
+            )
             new_row = {
                 "文件名": allname,
                 "日期": date,
@@ -1057,7 +1080,11 @@ class FinTableExtractor:
                                 or len(answer) >= 2000
                                 or len(re.findall("是.否", answer)) >= 2
                                 or len(re.findall("适用.不适用", answer)) >= 2
-                                or len(re.findall("第(?:一|二|三|四|五|六|七|八|九|十)节", answer))
+                                or len(
+                                    re.findall(
+                                        "第(?:一|二|三|四|五|六|七|八|九|十)节", answer
+                                    )
+                                )
                                 >= 2
                             ):
                                 check_cut = False
@@ -1086,7 +1113,11 @@ class FinTableExtractor:
                             elif (
                                 re.search(keywords_stop_re, line_dict["inside"])
                                 or len(answer) >= 2000
-                                or len(re.findall("第(?:一|二|三|四|五|六|七|八|九|十)节", answer))
+                                or len(
+                                    re.findall(
+                                        "第(?:一|二|三|四|五|六|七|八|九|十)节", answer
+                                    )
+                                )
                                 >= 2
                             ):
                                 check_cut = False
@@ -1108,16 +1139,25 @@ class FinTableExtractor:
                             cut2, "(?:关键审计事项)$", "(?:其他信息)$", check_cut2
                         )
                         cut3, check_cut3 = check_answers(
-                            cut3, "主要会计数据和财务指标", "分季度主要财务指标", check_cut3
+                            cut3,
+                            "主要会计数据和财务指标",
+                            "分季度主要财务指标",
+                            check_cut3,
                         )
                         cut4, check_cut4 = check_answers(
-                            cut4, "公司主要销售客户情况", "公司主要供应商情况", check_cut4
+                            cut4,
+                            "公司主要销售客户情况",
+                            "公司主要供应商情况",
+                            check_cut4,
                         )
                         cut5, check_cut5 = check_answers(
                             cut5, "公司主要供应商情况", "研发投入|费用", check_cut5
                         )
                         cut6, check_cut6 = check_answers2(
-                            cut6, "(?:研发投入|近三年公司研发投入金额及占营业收入的比例)$", "现金流", check_cut6
+                            cut6,
+                            "(?:研发投入|近三年公司研发投入金额及占营业收入的比例)$",
+                            "现金流",
+                            check_cut6,
                         )
                         cut7, check_cut7 = check_answers(
                             cut7, "(?:现金流)$", "非主营业务情况", check_cut7
@@ -1126,13 +1166,22 @@ class FinTableExtractor:
                             cut8, "(?:资产及负债状况)$", "投资状况分析", check_cut8
                         )
                         cut9, check_cut9 = check_answers(
-                            cut9, "重大资产和股权出售", "主要控股参股公司分析", check_cut9
+                            cut9,
+                            "重大资产和股权出售",
+                            "主要控股参股公司分析",
+                            check_cut9,
                         )
                         cut10, check_cut10 = check_answers(
-                            cut10, "主要控股参股公司分析", "公司未来发展的展望", check_cut10
+                            cut10,
+                            "主要控股参股公司分析",
+                            "公司未来发展的展望",
+                            check_cut10,
                         )
                         cut11, check_cut11 = check_answers(
-                            cut11, "公司未来发展的展望", "接待调研、沟通、采访等活动登记表", check_cut11
+                            cut11,
+                            "公司未来发展的展望",
+                            "接待调研、沟通、采访等活动登记表",
+                            check_cut11,
                         )
                         cut12, check_cut12 = check_answers(
                             cut12,
@@ -1159,7 +1208,10 @@ class FinTableExtractor:
                             cut16, "重大诉讼、仲裁事项", "处罚及整改情况", check_cut16
                         )
                         cut17, check_cut17 = check_answers(
-                            cut17, "处罚及整改情况", "公司及其控股股东、实际控制人的诚信状况", check_cut17
+                            cut17,
+                            "处罚及整改情况",
+                            "公司及其控股股东、实际控制人的诚信状况",
+                            check_cut17,
                         )
                         cut18, check_cut18 = check_answers(
                             cut18,
@@ -1171,7 +1223,10 @@ class FinTableExtractor:
                             cut19, "重大关联交易", "重大合同及其履行情况", check_cut19
                         )
                         cut20, check_cut20 = check_answers2(
-                            cut20, "重大合同及其履行情况", "其他重大事项的说明", check_cut20
+                            cut20,
+                            "重大合同及其履行情况",
+                            "其他重大事项的说明",
+                            check_cut20,
                         )
                         cut21, check_cut21 = check_answers(
                             cut21,
@@ -1180,10 +1235,16 @@ class FinTableExtractor:
                             check_cut21,
                         )
                         cut22, check_cut22 = check_answers(
-                            cut22, "社会责任情况", "重要事项|股份变动情况|其他重大事项的说明", check_cut22
+                            cut22,
+                            "社会责任情况",
+                            "重要事项|股份变动情况|其他重大事项的说明",
+                            check_cut22,
                         )
                         cut23, check_cut23 = check_answers(
-                            cut23, "公司董事、监事、高级管理人员变动情况", "任职情况", check_cut23
+                            cut23,
+                            "公司董事、监事、高级管理人员变动情况",
+                            "任职情况",
+                            check_cut23,
                         )
                         cut24, check_cut24 = check_answers2(
                             cut24, "公司员工情况", "培训计划", check_cut24
@@ -1191,11 +1252,15 @@ class FinTableExtractor:
                         cut25, check_cut25 = check_answers(
                             cut25,
                             "对会计师事务所本报告期“非标准审计报告”的说明",
-                            "董事会对该事项的意见|独立董事意见|监事会意见|消除有关事项及其影响的" "具体措施",
+                            "董事会对该事项的意见|独立董事意见|监事会意见|消除有关事项及其影响的"
+                            "具体措施",
                             check_cut25,
                         )
                         cut26, check_cut26 = check_answers(
-                            cut26, "公司控股股东情况", "同业竞争情况|重大事项", check_cut26
+                            cut26,
+                            "公司控股股东情况",
+                            "同业竞争情况|重大事项",
+                            check_cut26,
                         )
                         cut27, check_cut27 = check_answers(
                             cut27,

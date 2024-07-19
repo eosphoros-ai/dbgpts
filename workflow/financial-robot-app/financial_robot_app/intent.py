@@ -1,4 +1,5 @@
 """KeywordExtractor class."""
+
 import logging
 from typing import Optional
 
@@ -69,9 +70,3 @@ class FinIntentExtractorOperator(MapOperator[ModelRequest, ModelRequest]):
         fin_intent = await extractor.extract(request.messages[-1].content)
         request.context.extra["intent"] = fin_intent
         return request
-
-
-
-
-
-

@@ -16,8 +16,15 @@ from pydantic import BaseModel, Field
 from tqdm import tqdm
 
 from dbgpt.core import Document, Chunk
-from dbgpt.core.awel import MapOperator, BranchOperator, BranchFunc, BranchTaskType, \
-    JoinOperator, DAG, logger
+from dbgpt.core.awel import (
+    MapOperator,
+    BranchOperator,
+    BranchFunc,
+    BranchTaskType,
+    JoinOperator,
+    DAG,
+    logger,
+)
 from dbgpt.datasource.db_conn_info import DBConfig
 from dbgpt.datasource.manages import ConnectorManager
 from dbgpt.datasource.rdbms.base import RDBMSConnector
@@ -33,11 +40,12 @@ from .fin_knowledge import FinReportKnowledge
 
 class KnowledgeLoaderOperator(MapOperator[Dict, Dict]):
     """Knowledge Factory Operator."""
+
     def __init__(
         self,
         datasource: Optional[str] = None,
         knowledge_type: Optional[str] = KnowledgeType.DOCUMENT.name,
-        **kwargs
+        **kwargs,
     ):
         """Init the query rewrite operator.
 
@@ -48,9 +56,7 @@ class KnowledgeLoaderOperator(MapOperator[Dict, Dict]):
         self._datasource = datasource
         self._knowledge_type = knowledge_type
 
-    async def map(
-            self, knowledge_request: Dict
-    ) -> Dict:
+    async def map(self, knowledge_request: Dict) -> Dict:
         """Create knowledge from datasource."""
         datasource = self._datasource or knowledge_request.get("datasource")
         knowledge = FinReportKnowledge(file_path=datasource)
@@ -61,8 +67,13 @@ class KnowledgeLoaderOperator(MapOperator[Dict, Dict]):
 
 class FinTextExtractOperator(MapOperator[Dict, Dict]):
     """Financial Text Extract Operator."""
-    def __init__(self, task_name="extract_text_task",
-                 chunk_parameters: Optional[ChunkParameters] = None, **kwargs):
+
+    def __init__(
+        self,
+        task_name="extract_text_task",
+        chunk_parameters: Optional[ChunkParameters] = None,
+        **kwargs,
+    ):
         self._chunk_parameters = chunk_parameters or "./tmp"
         super().__init__(task_name=task_name, **kwargs)
 
@@ -84,8 +95,7 @@ class FinTextExtractOperator(MapOperator[Dict, Dict]):
         for item in list(merged_data.items()):
             page_documents.append(
                 Document(
-                    content=item[1],
-                    metadata={"page": item[0], "title": file_title}
+                    content=item[1], metadata={"page": item[0], "title": file_title}
                 )
             )
         chunks: List[Chunk] = chunk_manager.split(page_documents)
@@ -96,8 +106,12 @@ class FinTextExtractOperator(MapOperator[Dict, Dict]):
 class FinTableExtractorOperator(MapOperator[str, DataFrame]):
     """Financial Table Extract Operator."""
 
-    def __init__(self, task_name="extract_table_task",
-                 tmp_dir_path: Optional[str] = None, **kwargs):
+    def __init__(
+        self,
+        task_name="extract_table_task",
+        tmp_dir_path: Optional[str] = None,
+        **kwargs,
+    ):
         self._tmp_dir_path = tmp_dir_path or "./tmp"
         self._tmp_excel_path = tmp_dir_path
         super().__init__(task_name=task_name, **kwargs)
@@ -165,8 +179,7 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
         # excel_directory = os.path.dirname(self._tmp_excel_path)
         if not os.path.exists(self._tmp_excel_path):
             os.makedirs(self._tmp_excel_path)
-        df1.to_excel(self._tmp_excel_path + "table_data_base_info.xlsx",
-                     index=False)
+        df1.to_excel(self._tmp_excel_path + "table_data_base_info.xlsx", index=False)
         results = []
         list1 = [
             "文件名",
@@ -406,8 +419,7 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
             txt_extracter = FinTableExtractor(file_name)
             results.append(txt_extracter.extract_fin_data())
         df2 = pd.DataFrame(results)
-        df2.to_excel(self._tmp_excel_path + "/table_data_fin_info.xlsx",
-                     index=False)
+        df2.to_excel(self._tmp_excel_path + "/table_data_fin_info.xlsx", index=False)
         # process other col
         results = []
         df3 = pd.DataFrame(
@@ -453,35 +465,42 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
             txt_extracter = FinTableExtractor(file_name)
             results.append(txt_extracter.extract_other_col())
         df3 = pd.DataFrame(results)
-        df3.to_excel(self._tmp_excel_path + "/table_data_other_info.xlsx",
-                     index=False)
+        df3.to_excel(self._tmp_excel_path + "/table_data_other_info.xlsx", index=False)
         # check if the three files have the same "文件名" column
         if (
-                "文件名" not in df1.columns
-                or "文件名" not in df2.columns
-                or "文件名" not in df3.columns
+            "文件名" not in df1.columns
+            or "文件名" not in df2.columns
+            or "文件名" not in df3.columns
         ):
             raise ValueError(
-                "One of the Excel files does not have the '文件名' column.")
+                "One of the Excel files does not have the '文件名' column."
+            )
         # merge to DataFrame
-        df = df1.merge(df2, on="文件名", how="inner").merge(df3, on="文件名",
-                                                            how="inner")
+        df = df1.merge(df2, on="文件名", how="inner").merge(
+            df3, on="文件名", how="inner"
+        )
         # to excel
         df.to_excel(
-            self._tmp_excel_path + "/big_data_old.xlsx", engine="openpyxl",
-            index=False
+            self._tmp_excel_path + "/big_data_old.xlsx", engine="openpyxl", index=False
         )
         df["行业名称"] = ""
         new_name_list = {
-            "营业成本率": {"公式": "营业成本率=营业成本/营业收入",
-                           "数值": ["营业成本", "营业收入"]},
+            "营业成本率": {
+                "公式": "营业成本率=营业成本/营业收入",
+                "数值": ["营业成本", "营业收入"],
+            },
             "投资收益占营业收入比率": {
                 "公式": "投资收益占营业收入比率=投资收益/营业收入",
-                "数值": ["投资收益", "营业收入"]},
-            "管理费用率": {"公式": "管理费用率=管理费用/营业收入",
-                           "数值": ["管理费用", "营业收入"]},
-            "财务费用率": {"公式": "财务费用率=财务费用/营业收入",
-                           "数值": ["财务费用", "营业收入"]},
+                "数值": ["投资收益", "营业收入"],
+            },
+            "管理费用率": {
+                "公式": "管理费用率=管理费用/营业收入",
+                "数值": ["管理费用", "营业收入"],
+            },
+            "财务费用率": {
+                "公式": "财务费用率=财务费用/营业收入",
+                "数值": ["财务费用", "营业收入"],
+            },
             "三费比重": {
                 "公式": "三费比重=(销售费用+管理费用+财务费用)/营业收入",
                 "数值": ["销售费用", "管理费用", "财务费用", "营业收入"],
@@ -492,10 +511,12 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
             },
             "企业研发经费与利润比值": {
                 "公式": "企业研发经费与利润比值=研发费用/净利润",
-                "数值": ["研发费用", "净利润"]},
+                "数值": ["研发费用", "净利润"],
+            },
             "企业研发经费与营业收入比值": {
                 "公式": "企业研发经费与营业收入比值=研发费用/营业收入",
-                "数值": ["研发费用", "营业收入"]},
+                "数值": ["研发费用", "营业收入"],
+            },
             "研发人员占职工人数比例": {
                 "公式": "研发人员占职工人数比例=研发人员人数/职工总人数",
                 "数值": ["研发人员人数", "职工总人数"],
@@ -504,24 +525,42 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
                 "公式": "企业硕士及以上人员占职工人数比例=(硕士员工人数 + 博士及以上的员工人数)/职工总人数",
                 "数值": ["硕士员工人数", "博士及以上的员工人数", "职工总人数"],
             },
-            "毛利率": {"公式": "毛利率=(营业收入-营业成本)/营业收入",
-                       "数值": ["营业收入", "营业成本"]},
-            "营业利润率": {"公式": "营业利润率=营业利润/营业收入",
-                           "数值": ["营业利润", "营业收入"]},
-            "流动比率": {"公式": "流动比率=流动资产/流动负债",
-                         "数值": ["流动资产", "流动负债"]},
-            "速动比率": {"公式": "速动比率=(流动资产-存货)/流动负债",
-                         "数值": ["流动资产", "存货", "流动负债"]},
-            "资产负债比率": {"公式": "资产负债比率=总负债/资产总额",
-                             "数值": ["总负债", "资产总额"]},
-            "现金比率": {"公式": "现金比率=货币资金/流动负债",
-                         "数值": ["货币资金", "流动负债"]},
-            "非流动负债比率": {"公式": "非流动负债比率=非流动负债/总负债",
-                               "数值": ["非流动负债", "总负债"]},
-            "流动负债比率": {"公式": "流动负债比率=流动负债/总负债",
-                             "数值": ["流动负债", "总负债"]},
-            "净利润率": {"公式": "净利润率=净利润/营业收入",
-                         "数值": ["净利润", "营业收入"]},
+            "毛利率": {
+                "公式": "毛利率=(营业收入-营业成本)/营业收入",
+                "数值": ["营业收入", "营业成本"],
+            },
+            "营业利润率": {
+                "公式": "营业利润率=营业利润/营业收入",
+                "数值": ["营业利润", "营业收入"],
+            },
+            "流动比率": {
+                "公式": "流动比率=流动资产/流动负债",
+                "数值": ["流动资产", "流动负债"],
+            },
+            "速动比率": {
+                "公式": "速动比率=(流动资产-存货)/流动负债",
+                "数值": ["流动资产", "存货", "流动负债"],
+            },
+            "资产负债比率": {
+                "公式": "资产负债比率=总负债/资产总额",
+                "数值": ["总负债", "资产总额"],
+            },
+            "现金比率": {
+                "公式": "现金比率=货币资金/流动负债",
+                "数值": ["货币资金", "流动负债"],
+            },
+            "非流动负债比率": {
+                "公式": "非流动负债比率=非流动负债/总负债",
+                "数值": ["非流动负债", "总负债"],
+            },
+            "流动负债比率": {
+                "公式": "流动负债比率=流动负债/总负债",
+                "数值": ["流动负债", "总负债"],
+            },
+            "净利润率": {
+                "公式": "净利润率=净利润/营业收入",
+                "数值": ["净利润", "营业收入"],
+            },
         }
         for new_name in new_name_list:
             df[new_name] = ""
@@ -535,8 +574,7 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
         txt_folder = self._tmp_dir_path + "/txt"
         # txt_folder = _tmp_txt_path
         # get all the txt name
-        txt_files = [file for file in os.listdir(txt_folder) if
-                     file.endswith(".txt")]
+        txt_files = [file for file in os.listdir(txt_folder) if file.endswith(".txt")]
         # process txt
         for txt_file in tqdm(txt_files, desc="Processing txts"):
             # txt path
@@ -572,11 +610,15 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
 
 class DatabaseStorageOperator(MapOperator[Dict, str]):
     """Database Storage Operator."""
-    def __init__(self, db_config: Optional[DBConfig] = None,
-                 conn_database: Optional[RDBMSConnector] = None,
-                 connector_manager: Optional[ConnectorManager] = None,
-                 tmp_dir_path: Optional[str] = None,
-                 **kwargs):
+
+    def __init__(
+        self,
+        db_config: Optional[DBConfig] = None,
+        conn_database: Optional[RDBMSConnector] = None,
+        connector_manager: Optional[ConnectorManager] = None,
+        tmp_dir_path: Optional[str] = None,
+        **kwargs,
+    ):
         """Init the datasource operator."""
         super().__init__(**kwargs)
         self._db_config = db_config
@@ -594,7 +636,7 @@ class DatabaseStorageOperator(MapOperator[Dict, str]):
         self._db_config = DBConfig(
             db_name=f"{space}_fin_report",
             db_type=self._conn_database.db_type,
-            file_path=(self._tmp_dir_path or "./tmp") + f"/{space}/fin_report.db"
+            file_path=(self._tmp_dir_path or "./tmp") + f"/{space}/fin_report.db",
         )
         if self._conn_database:
             dataframe.to_sql(
@@ -613,8 +655,8 @@ class DatabaseStorageOperator(MapOperator[Dict, str]):
 
 class VectorStorageOperator(MapOperator[Dict, List[Chunk]]):
     """Vector Storage Operator."""
-    def __init__(self, index_store: Optional[IndexStoreBase] = None,
-                 **kwargs):
+
+    def __init__(self, index_store: Optional[IndexStoreBase] = None, **kwargs):
         """Init the datasource operator."""
         super().__init__(**kwargs)
         self._index_store = index_store
@@ -648,9 +690,12 @@ class VectorStorageOperator(MapOperator[Dict, List[Chunk]]):
 class KnowledgeExtractBranchOperator(BranchOperator[Knowledge, Knowledge]):
     """The Knowledge Extract branch operator."""
 
-    def __init__(self, text_task_name: Optional[str] = None,
-                 table_task_name: Optional[str] = None,
-                 **kwargs):
+    def __init__(
+        self,
+        text_task_name: Optional[str] = None,
+        table_task_name: Optional[str] = None,
+        **kwargs,
+    ):
         """Create the intent detection branch operator."""
         super().__init__(**kwargs)
         self._text_task_name = text_task_name
@@ -717,29 +762,23 @@ class RequestHandleOperator(MapOperator[TriggerReqBody, Dict]):
         return {"space": input_value["space"], "datasource": input_value["file_path"]}
 
 
-with DAG("fin_report_knowledge_processing_task") as dag:
-    trigger = HttpTrigger(
-        "/dbgpts/fin_knowledge_process", request_body=TriggerReqBody
-    )
+with DAG(
+    "fin_report_knowledge_processing_task",
+    tags={"knowledge_factory_domain_type": "FinancialReport"},
+) as dag:
+    trigger = HttpTrigger("/dbgpts/fin_knowledge_process", request_body=TriggerReqBody)
     request_task = RequestHandleOperator()
     cfg = Config()
     local_db_manager = cfg.local_db_manager
     tmp_dir_path = f"{PILOT_PATH}/data/"
     knowledge_factory = KnowledgeLoaderOperator()
     extract_branch = KnowledgeExtractBranchOperator(
-        text_task_name="extract_text_task",
-        table_task_name="extract_table_task"
+        text_task_name="extract_text_task", table_task_name="extract_table_task"
     )
     chunk_parameters = ChunkParameters(chunk_strategy="Automatic")
-    extract_text_task = FinTextExtractOperator(
-        chunk_parameters=chunk_parameters
-    )
-    vector_storage = VectorStorageOperator(
-        index_store=None
-    )
-    extractor_table_task = FinTableExtractorOperator(
-        tmp_dir_path=tmp_dir_path
-    )
+    extract_text_task = FinTextExtractOperator(chunk_parameters=chunk_parameters)
+    vector_storage = VectorStorageOperator(index_store=None)
+    extractor_table_task = FinTableExtractorOperator(tmp_dir_path=tmp_dir_path)
     database_storage = DatabaseStorageOperator(
         connector_manager=local_db_manager,
         tmp_dir_path=tmp_dir_path,
@@ -748,4 +787,3 @@ with DAG("fin_report_knowledge_processing_task") as dag:
     trigger >> request_task >> knowledge_factory >> extract_branch
     extract_branch >> extract_text_task >> vector_storage >> result_join_task
     extract_branch >> extractor_table_task >> database_storage >> result_join_task
-
