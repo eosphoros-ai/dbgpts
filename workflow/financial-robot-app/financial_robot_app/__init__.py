@@ -2,7 +2,6 @@
 
 from typing import List
 
-from all_in_one_entrance import ChatNormalOperator
 from dbgpt._private.config import Config
 from dbgpt.component import ComponentType
 from dbgpt.core import (
@@ -36,6 +35,8 @@ from .chat_indicator import ChatIndicatorOperator
 from .chat_knowledge import ChatKnowledgeOperator
 from .classifier import QuestionClassifierOperator, QuestionClassifierBranchOperator
 from .intent import FinIntentExtractorOperator
+from .chat_normal import ChatNormalOperator
+
 
 
 class RequestHandleOperator(
