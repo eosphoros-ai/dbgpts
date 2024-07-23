@@ -76,6 +76,8 @@ class QuestionClassifierOperator(MapOperator[IN, OUT]):
         if not classifier_pkl:
             raise ValueError("classifier_pkl must be provided")
         self._model = model
+        self._pretrained_model = None
+        self._tokenizer = None
         # self._pretrained_model = AutoModel.from_pretrained(self._model)
         # self._tokenizer = AutoTokenizer.from_pretrained(self._model)
         self._pkl = classifier_pkl
@@ -84,9 +86,10 @@ class QuestionClassifierOperator(MapOperator[IN, OUT]):
 
     async def map(self, request: ModelRequest) -> ModelRequest:
         """Map the user question to a financial."""
-
-        self._pretrained_model = AutoModel.from_pretrained(self._model)
-        self._tokenizer = AutoTokenizer.from_pretrained(self._model)
+        if not self._pretrained_model:
+            self._pretrained_model = AutoModel.from_pretrained(self._model)
+        if not self._tokenizer:
+            self._tokenizer = AutoTokenizer.from_pretrained(self._model)
         clf_loaded = joblib.load(self._pkl)
         messages = request.messages
         question = [message.content for message in messages]

@@ -116,7 +116,7 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
         self._tmp_excel_path = tmp_dir_path
         super().__init__(task_name=task_name, **kwargs)
 
-    def map(self, knowledge_request: Dict) -> Dict:
+    async def map(self, knowledge_request: Dict) -> Dict:
         """Extract knowledge from text."""
         # read txt file
         space = knowledge_request.get("space")
