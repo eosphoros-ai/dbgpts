@@ -1,7 +1,7 @@
 """The Question Classifier Operator."""
 
 from enum import Enum
-from typing import Dict, Optional
+from typing import Dict
 
 import joblib
 import torch
@@ -21,6 +21,7 @@ class FinQuestionClassifierType(Enum):
     FINANCIAL_INDICATOR = "财务指标计算"
     GLOSSARY = "专业名称解释"
     COMPARISON = "统计对比"
+    OTHER = "其他问题"
 
     @classmethod
     def get_by_value(cls, value: str):
@@ -75,14 +76,17 @@ class QuestionClassifierOperator(MapOperator[IN, OUT]):
         if not classifier_pkl:
             raise ValueError("classifier_pkl must be provided")
         self._model = model
-        self._pretrained_model = AutoModel.from_pretrained(self._model)
-        self._tokenizer = AutoTokenizer.from_pretrained(self._model)
+        # self._pretrained_model = AutoModel.from_pretrained(self._model)
+        # self._tokenizer = AutoTokenizer.from_pretrained(self._model)
         self._pkl = classifier_pkl
         self._batch_size = 4
         super().__init__(**kwargs)
 
     async def map(self, request: ModelRequest) -> ModelRequest:
         """Map the user question to a financial."""
+
+        self._pretrained_model = AutoModel.from_pretrained(self._model)
+        self._tokenizer = AutoTokenizer.from_pretrained(self._model)
         clf_loaded = joblib.load(self._pkl)
         messages = request.messages
         question = [message.content for message in messages]
@@ -100,7 +104,7 @@ class QuestionClassifierOperator(MapOperator[IN, OUT]):
         for i in tqdm(
             range(0, len(sentences), self._batch_size), desc="Generating Embeddings"
         ):
-            batch = sentences[i : i + self._batch_size]
+            batch = sentences[i: i + self._batch_size]
             encoded_input = self._tokenizer(
                 batch, padding=True, truncation=True, return_tensors="pt"
             )
@@ -138,6 +142,8 @@ class QuestionClassifierBranchOperator(BranchOperator[ModelRequest, ModelRequest
                     return False
                 if classifier == FinQuestionClassifierType.FINANCIAL_INDICATOR:
                     return outer_task_name == "chat_indicator"
+                elif classifier == FinQuestionClassifierType.OTHER:
+                    return outer_task_name == "chat_normal"
                 else:
                     return outer_task_name == "chat_knowledge"
 

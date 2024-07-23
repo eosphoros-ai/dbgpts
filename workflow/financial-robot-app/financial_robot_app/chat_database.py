@@ -144,7 +144,7 @@ class ChatDataOperator(MapOperator[ModelRequest, ModelRequest]):
         self._db_name = input_value.get("db_name")
         self._intent = input_value.get("intent")
         self._database = cfg.local_db_manager.get_connector(self._db_name)
-        company_df = self._database.run_to_df(f"select 公司名称_x from fin_report")
+        company_df = self._database.run_to_df("select 公司名称_x from fin_report")
         self._company_list = [
             item[0] for item in company_df.values.tolist() if item is not None
         ]
@@ -189,7 +189,7 @@ class ChatDataOperator(MapOperator[ModelRequest, ModelRequest]):
         )
         prompt = ChatPromptTemplate(
             messages=[
-                SystemPromptTemplate.from_template(
+                HumanPromptTemplate.from_template(
                     prompt_template,
                     response_format=json.dumps(
                         response_format_simple, ensure_ascii=False, indent=4

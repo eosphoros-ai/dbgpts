@@ -2,6 +2,7 @@
 
 from typing import List
 
+from all_in_one_entrance import ChatNormalOperator
 from dbgpt._private.config import Config
 from dbgpt.component import ComponentType
 from dbgpt.core import (
@@ -138,6 +139,7 @@ with DAG(
     sql_parse_task = ChatDatabaseOutputParserOperator()
     sql_chart_task = ChatDatabaseChartOperator()
     indicator_task = ChatIndicatorOperator()
+    chat_normal_task = ChatNormalOperator()
     indicator_llm_task = LLMOperator()
     indicator_sql_parse_task = ChatDatabaseOutputParserOperator(
         task_name="indicator_sql_parse_task"
@@ -146,7 +148,7 @@ with DAG(
         task_name="indicator_sql_chart_task"
     )
     chat_knowledge_task = ChatKnowledgeOperator()
-    stream_llm_task = StreamingLLMOperator(llm_client)
+    stream_llm_task = StreamingLLMOperator()
     join_task = FinChatJoinOperator()
     # query classifier
     (
@@ -176,3 +178,5 @@ with DAG(
     )
     # chat knowledge branch
     (classifier_branch >> chat_knowledge_task >> stream_llm_task >> join_task)
+    # chat normal branch
+    (classifier_branch >> chat_normal_task >> StreamingLLMOperator() >> join_task)

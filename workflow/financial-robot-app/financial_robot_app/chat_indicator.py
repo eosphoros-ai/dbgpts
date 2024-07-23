@@ -16,7 +16,6 @@ from dbgpt.core import (
 from dbgpt.core.awel import MapOperator
 from dbgpt.core.awel.flow import IOField, OperatorCategory, Parameter, ViewMetadata
 from dbgpt.datasource.rdbms.base import RDBMSConnector
-from .intent import FinReportIntent
 from dbgpt.util.i18n_utils import _
 
 _DEFAULT_TEMPLATE_EN = """You are a database expert. Please answer the user's question 
@@ -84,35 +83,35 @@ _DEFAULT_TEMPLATE_ZH = """你是一个数据库专家.
 
 fin_indicator_map = {
     "营业成本率": {
-        "公式": "营业成本率=CAST(营业成本)/CAST(营业收入)",
+        "公式": "营业成本率=CAST(REPLACE(营业成本, ',', '')  AS FLOAT)/CAST(REPLACE(营业收入, ',', '')  AS FLOAT)",
         "数值": ["营业成本", "营业收入"],
     },
     "投资收益占营业收入比率": {
-        "公式": "投资收益占营业收入比率=CAST(投资收益)/CAST(营业收入)",
+        "公式": "投资收益占营业收入比率=CAST(REPLACE(投资收益, ',', '')  AS FLOAT)/CAST(REPLACE(营业收入, ',', '')  AS FLOAT)",
         "数值": ["投资收益", "营业收入"],
     },
     "管理费用率": {
-        "公式": "管理费用率=CAST(管理费用)/CAST(营业收入)",
+        "公式": "管理费用率=CAST(管理费用REPLACE(营业收入, ',', '')  AS FLOAT)/CAST(REPLACE(营业收入, ',', '')  AS FLOAT)",
         "数值": ["管理费用", "营业收入"],
     },
     "财务费用率": {
-        "公式": "财务费用率=CAST(财务费用)/CAST(营业收入)",
+        "公式": "财务费用率=CAST(REPLACE(财务费用, ',', '')  AS FLOAT)/CAST(REPLACE(营业收入, ',', '')  AS FLOAT)",
         "数值": ["财务费用", "营业收入"],
     },
     "三费比重": {
-        "公式": "三费比重=(CAST(销售费用+管理费用+财务费用))/营业收入",
+        "公式": "三费比重=(CAST(销售费用+管理费用+财务费用))/REPLACE(营业收入, ',', '')  AS FLOAT",
         "数值": ["销售费用", "管理费用", "财务费用", "营业收入"],
     },
     "企业研发经费占费用比例": {
-        "公式": "企业研发经费占费用比例=CAST(研发费用)/CAST((销售费用+财务费用+管理费用+研发费用))",
+        "公式": "企业研发经费占费用比例=CAST(CAST(REPLACE(研发费用, ',', '')  AS FLOAT)/CAST((销售费用+财务费用+管理费用+研发费用))",
         "数值": ["研发费用", "销售费用", "财务费用", "管理费用"],
     },
     "企业研发经费与利润比值": {
-        "公式": "企业研发经费与利润比值=CAST(研发费用)/CAST(净利润)",
+        "公式": "企业研发经费与利润比值=CAST(CAST(REPLACE(研发费用, ',', '')  AS FLOAT)/CAST(REPLACE(净利润, ',', '')  AS FLOAT)",
         "数值": ["研发费用", "净利润"],
     },
     "企业研发经费与营业收入比值": {
-        "公式": "企业研发经费与营业收入比值=CAST(研发费用)/CAST(营业收入)",
+        "公式": "企业研发经费与营业收入比值=CAST(CAST(REPLACE(研发费用, ',', '')  AS FLOAT)/CAST(REPLACE(营业收入, ',', '')  AS FLOAT)",
         "数值": ["研发费用", "营业收入"],
     },
     "销售人员占比": {
@@ -144,39 +143,39 @@ fin_indicator_map = {
         "数值": ["硕士人员", "博士及以上人员", "职工总数"],
     },
     "毛利率": {
-        "公式": "毛利率=(CAST(营业收入)-CAST(营业成本))/CAST(营业收入)",
+        "公式": "毛利率=(CAST(REPLACE(营业收入, ',', '')  AS FLOAT)-CAST(REPLACE(营业成本, ',', '')  AS FLOAT))/CAST(REPLACE(营业收入, ',', '')  AS FLOAT)",
         "数值": ["营业收入", "营业成本"],
     },
     "营业利润率": {
-        "公式": "营业利润率=CAST(营业利润)/CAST(营业收入)",
+        "公式": "营业利润率=CAST(REPLACE(营业利润, ',', '')  AS FLOAT)/CAST(REPLACE(营业收入, ',', '')  AS FLOAT)",
         "数值": ["营业利润", "营业收入"],
     },
     "流动比率": {
-        "公式": "流动比率=CAST(流动资产合计)/CAST(流动负债合计)",
+        "公式": "流动比率=CAST(REPLACE(流动资产合计, ',', '')  AS FLOAT)/CAST(REPLACE(流动负债合计, ',', '')  AS FLOAT)",
         "数值": ["流动资产合计", "流动负债合计"],
     },
     "速动比率": {
-        "公式": "速动比率=(CAST(流动资产合计)-CAST(存货))/CAST(流动负债合计)",
+        "公式": "速动比率=(CAST(REPLACE(流动资产合计, ',', '')  AS FLOAT)-CAST(REPLACE(存货, ',', '')  AS FLOAT))/CAST(REPLACE(流动负债合计, ',', '')  AS FLOAT)",
         "数值": ["流动资产合计", "存货", "流动负债合计"],
     },
     "资产负债比率": {
-        "公式": "资产负债比率=CAST(负债合计)/CAST(资产总计)",
+        "公式": "资产负债比率=CAST(REPLACE(负债合计, ',', '')  AS FLOAT)/CAST(REPLACE(资产总计, ',', '')  AS FLOAT)",
         "数值": ["负债合计", "资产总计"],
     },
     "现金比率": {
-        "公式": "现金比率=CAST(货币资金)/CAST(流动负债合计)",
+        "公式": "现金比率=CAST(货币资金REPLACE(货币资金, ',', '')  AS FLOAT)/CAST(REPLACE(流动负债合计, ',', '')  AS FLOAT)",
         "数值": ["货币资金", "流动负债合计"],
     },
     "非流动负债合计比率": {
-        "公式": "非流动负债合计比率=CAST(非流动负债合计)/CAST(负债合计)",
+        "公式": "非流动负债合计比率=CAST(REPLACE(非流动负债合计, ',', '')  AS FLOAT)/CAST(REPLACE(负债合计, ',', '')  AS FLOAT)",
         "数值": ["非流动负债合计", "负债合计"],
     },
     "流动负债合计比率": {
-        "公式": "流动负债合计比率=CAST(流动负债合计)/CAST(负债合计)",
+        "公式": "流动负债合计比率=CAST(REPLACE(流动负债合计, ',', '')  AS FLOAT)/CAST(REPLACE(负债合计, ',', '')  AS FLOAT)",
         "数值": ["流动负债合计", "负债合计"],
     },
     "净利润率": {
-        "公式": "净利润率=CAST(净利润)/CAST(营业收入)",
+        "公式": "净利润率=CAST(REPLACE(净利润, ',', '')  AS FLOAT)/CAST(REPLACE(营业收入, ',', '')  AS FLOAT)",
         "数值": ["净利润", "营业收入"],
     },
 }
@@ -243,7 +242,6 @@ class ChatIndicatorOperator(MapOperator[ModelRequest, ModelRequest]):
 
         self._intent = input_value.context.extra.get("intent")
         self._db_name = input_value.context.extra.get("db_name")
-
         self._database = self._cfg.local_db_manager.get_connector(self._db_name)
 
         await self.current_dag_context.save_to_share_data(
@@ -278,7 +276,7 @@ class ChatIndicatorOperator(MapOperator[ModelRequest, ModelRequest]):
         )
         prompt = ChatPromptTemplate(
             messages=[
-                SystemPromptTemplate.from_template(
+                HumanPromptTemplate.from_template(
                     prompt_template,
                     response_format=json.dumps(
                         response_format_simple, ensure_ascii=False, indent=4

@@ -32,10 +32,10 @@ from dbgpt.datasource.rdbms.conn_sqlite import SQLiteConnector
 from dbgpt.rag import ChunkParameters
 from dbgpt.rag.chunk_manager import ChunkManager
 from dbgpt.rag.index.base import IndexStoreBase
-from dbgpt.rag.knowledge import KnowledgeFactory
 from dbgpt.rag.knowledge.base import Knowledge, KnowledgeType
 from .extract import FinTableExtractor, FinTableProcessor
 from .fin_knowledge import FinReportKnowledge
+from dbgpt.util.i18n_utils import _
 
 
 class KnowledgeLoaderOperator(MapOperator[Dict, Dict]):
@@ -628,7 +628,7 @@ class DatabaseStorageOperator(MapOperator[Dict, str]):
 
     async def map(self, knowledge_request: Dict) -> str:
         """Create datasource."""
-        dataframe = knowledge_request.get("dataframe")
+        dataframe: DataFrame = knowledge_request.get("dataframe")
         space = knowledge_request.get("space")
         self._conn_database = self._conn_database or SQLiteConnector.from_file_path(
             (self._tmp_dir_path or "./tmp") + f"/{space}/fin_report.db"
@@ -664,7 +664,7 @@ class VectorStorageOperator(MapOperator[Dict, List[Chunk]]):
     async def map(self, storage_request: Dict) -> List[Chunk]:
         """Persist chunks in vector db."""
         chunks = storage_request.get("chunks")
-        vector_store = self._index_store
+        vector_store: IndexStoreBase = self._index_store
         cfg = Config()
         if not vector_store:
             space_name = storage_request.get("space")
@@ -683,7 +683,9 @@ class VectorStorageOperator(MapOperator[Dict, List[Chunk]]):
                 vector_store_type=cfg.VECTOR_STORE_TYPE, vector_store_config=config
             )
             vector_store = connector.index_client
-        vector_store.load_document(chunks)
+        vector_store.load_document_with_limit(
+            chunks, cfg.KNOWLEDGE_MAX_CHUNKS_ONCE_LOAD
+        )
         return chunks
 
 

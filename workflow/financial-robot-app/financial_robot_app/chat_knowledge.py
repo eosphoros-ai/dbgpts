@@ -11,18 +11,21 @@ from dbgpt.core import (
     SystemPromptTemplate,
 )
 from dbgpt.core.awel import MapOperator
+from dbgpt.rag.embedding.embedding_factory import RerankEmbeddingFactory
+from dbgpt.rag.retriever.rerank import RerankEmbeddingsRanker
 from dbgpt.serve.rag.service.service import Service
 from dbgpt.storage.vector_store.filters import MetadataFilters, MetadataFilter
 from .intent import FinReportIntent
 
 
-_DEFAULT_TEMPLATE_ZH = """你是专业的金融分析专家，基于以下给出的已知信息, 准守规范约束，专业、简要回答用户的金融问题.
+_DEFAULT_TEMPLATE_ZH = """你是专业的金融财报分析专家，基于以下给出的已知信息, 准守规范约束，专业、简要回答用户的金融问题.
 规范约束:
-    1.如果已知信息包含的图片、链接、表格、代码块等特殊markdown标签格式的信息，确保在答案中包含原文这些
+    
+    1.作为一个金融财报分析专家，你只能回答所有与金融领域相关的问题，包括但不限于某公司股票代码，某公司法定代表人，某公司资产负债率，某公司毛利率，某公司技术人员占比等专业的金融领域知识答疑。 问题范例: 1.某公司法定代表人 2.某公司资产负债率 3.某公司技术人员占比
+    2.如果已知信息包含的图片、链接、表格、代码块等特殊markdown标签格式的信息，确保在答案中包含原文这些
     图片、链接、表格和代码标签，不要丢弃不要修改，如:图片格式：![image.png](xxx), 链接格式:
     [xxx](xxx), 表格格式:|xxx|xxx|xxx|, 代码格式:```xxx```.
-    2.如果无法从提供的内容中获取答案, 请说: "知识库中提供的内容不足以回答此问题" 禁止胡乱编造.
-    3.回答的时候最好按照1.2.3.点进行总结.
+    3.回答的时候最好按照1.2.3.点进行总结, 并以markdwon格式显示。
     已知内容: 
     {context}
     问题:
@@ -69,12 +72,17 @@ class ChatKnowledgeOperator(MapOperator[ModelRequest, ModelRequest]):
         from dbgpt.rag.embedding.embedding_factory import EmbeddingFactory
         from dbgpt.storage.vector_store.base import VectorStoreConfig
 
+
         user_input = input_value.messages[-1].content
+        user_inputs = [user_input]
         knowledge_name = self._knowledge_space or input_value.context.extra.get("space")
         intent: FinReportIntent = input_value.context.extra.get("intent")
-        hit_document_title, user_input, metadata_filter = self.get_fuzzy_match(
-            user_input, intent
+        hit_document_title, new_user_input, metadata_filter = self.get_fuzzy_match(
+            user_input, intent, knowledge_name
         )
+        if hit_document_title:
+            user_inputs.append(new_user_input)
+
         if not knowledge_name:
             raise ValueError("Knowledge name is required.")
 
@@ -95,22 +103,39 @@ class ChatKnowledgeOperator(MapOperator[ModelRequest, ModelRequest]):
         vector_store_connector = VectorStoreConnector(
             vector_store_type=self._cfg.VECTOR_STORE_TYPE, vector_store_config=config
         )
+        reranker = None
+        retriever_top_k = self._cfg.KNOWLEDGE_SEARCH_TOP_SIZE
+        if self._cfg.RERANK_MODEL:
+            rerank_embeddings = RerankEmbeddingFactory.get_instance(
+                self._cfg.SYSTEM_APP
+            ).create()
+            reranker = RerankEmbeddingsRanker(
+                rerank_embeddings, topk=self._cfg.RERANK_TOP_K
+            )
+            if retriever_top_k < self._cfg.RERANK_TOP_K or retriever_top_k < 20:
+                # We use reranker, so if the top_k is less than 20,
+                # we need to set it to 20
+                retriever_top_k = max(self._cfg.RERANK_TOP_K, 20)
         embedding_retriever = EmbeddingRetriever(
-            top_k=5,
+            top_k=retriever_top_k,
             index_store=vector_store_connector.client,
+            rerank=reranker,
         )
-        if metadata_filter:
-            chunks = await embedding_retriever.aretrieve_with_scores(
-                user_input,
-                0.3,
-                MetadataFilters(filters=[metadata_filter]),
-            )
-        else:
-            chunks = await embedding_retriever.aretrieve_with_scores(
-                user_input,
-                0.3,
-            )
-        context = "\n".join([doc.content for doc in chunks])
+        chunks = []
+        for query_text in user_inputs:
+            if metadata_filter:
+                chunks.extend(await embedding_retriever.aretrieve_with_scores(
+                    query_text,
+                    0.3,
+                    MetadataFilters(filters=[metadata_filter]),
+                ))
+            else:
+                chunks.extend(await embedding_retriever.aretrieve_with_scores(
+                    query_text,
+                    0.3,
+                ))
+        contents = [doc.content for doc in chunks]
+        context = "\n".join(set(contents))
 
         input_values = {"context": context, "question": user_input}
 
@@ -120,7 +145,7 @@ class ChatKnowledgeOperator(MapOperator[ModelRequest, ModelRequest]):
         )
         prompt = ChatPromptTemplate(
             messages=[
-                SystemPromptTemplate.from_template(prompt_template),
+                HumanPromptTemplate.from_template(prompt_template),
                 HumanPromptTemplate.from_template("{question}"),
             ]
         )
@@ -130,14 +155,14 @@ class ChatKnowledgeOperator(MapOperator[ModelRequest, ModelRequest]):
         request.messages = model_messages
         return request
 
-    def get_fuzzy_match(self, user_input, intent):
+    def get_fuzzy_match(self, user_input, intent, space):
         """fuzzy match for user input and get label filter"""
         knowledge_service = Service.get_instance(self._cfg.SYSTEM_APP)
         document_list = knowledge_service.get_document_list(
-            {"space": self._knowledge_space}, page=1, page_size=1000
+            {"space": space}, page=1, page_size=1000
         )
         document_titles = [document.doc_name for document in document_list.items]
-        if intent.company and intent.company is not "":
+        if intent and intent.company and intent.company is not "":
             from fuzzywuzzy import process
 
             best_match, confidence = process.extractOne(intent.company, document_titles)
