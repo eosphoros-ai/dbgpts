@@ -2,6 +2,7 @@ import glob
 import json
 import os
 import uuid
+from concurrent.futures import Executor, ThreadPoolExecutor
 from typing import Optional, List, Dict, Tuple
 
 import pandas as pd
@@ -11,6 +12,7 @@ from dbgpt.core.awel.trigger.http_trigger import HttpTrigger
 from dbgpt.rag.embedding import EmbeddingFactory
 from dbgpt.serve.rag.connector import VectorStoreConnector
 from dbgpt.storage.vector_store.base import VectorStoreConfig
+from dbgpt.util.executor_utils import blocking_func_to_async
 from pandas import DataFrame
 from pydantic import BaseModel, Field
 from tqdm import tqdm
@@ -35,7 +37,6 @@ from dbgpt.rag.index.base import IndexStoreBase
 from dbgpt.rag.knowledge.base import Knowledge, KnowledgeType
 from .extract import FinTableExtractor, FinTableProcessor
 from .fin_knowledge import FinReportKnowledge
-from dbgpt.util.i18n_utils import _
 
 
 class KnowledgeLoaderOperator(MapOperator[Dict, Dict]):
@@ -45,6 +46,7 @@ class KnowledgeLoaderOperator(MapOperator[Dict, Dict]):
         self,
         datasource: Optional[str] = None,
         knowledge_type: Optional[str] = KnowledgeType.DOCUMENT.name,
+        executor: Optional[Executor] = None,
         **kwargs,
     ):
         """Init the query rewrite operator.
@@ -55,12 +57,13 @@ class KnowledgeLoaderOperator(MapOperator[Dict, Dict]):
         super().__init__(**kwargs)
         self._datasource = datasource
         self._knowledge_type = knowledge_type
+        self._executor = executor or ThreadPoolExecutor()
 
     async def map(self, knowledge_request: Dict) -> Dict:
         """Create knowledge from datasource."""
         datasource = self._datasource or knowledge_request.get("datasource")
         knowledge = FinReportKnowledge(file_path=datasource)
-        knowledge.load()
+        await blocking_func_to_async(self._executor, knowledge.load)
         knowledge_request["knowledge"] = knowledge
         return knowledge_request
 
@@ -110,10 +113,12 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
         self,
         task_name="extract_table_task",
         tmp_dir_path: Optional[str] = None,
+        executor: Optional[Executor] = None,
         **kwargs,
     ):
         self._tmp_dir_path = tmp_dir_path or "./tmp"
         self._tmp_excel_path = tmp_dir_path
+        self._executor = executor or ThreadPoolExecutor()
         super().__init__(task_name=task_name, **kwargs)
 
     async def map(self, knowledge_request: Dict) -> Dict:
@@ -130,7 +135,15 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
             self._tmp_dir_path + "/txt",
             os.path.basename(fin_knowledge.file_path).replace(".pdf", ".txt"),
         )
-        self._save_all_text(all_text=fin_knowledge.all_text, tmp_txt_path=_tmp_txt_path)
+        await blocking_func_to_async(
+            self._executor,
+            self._save_all_text,
+            fin_knowledge.all_text,
+            _tmp_txt_path,
+        )
+        # self._save_all_text(
+        # all_text=fin_knowledge.all_text, tmp_txt_path=_tmp_txt_path
+        # )
         file_names = glob.glob(self._tmp_dir_path + "/txt/*")
         file_names = sorted(file_names, reverse=True)
         print("now process files: " + str(file_names))
@@ -174,7 +187,12 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
         )
         for file_name in file_names:
             txt_extractor = FinTableExtractor(file_name)
-            results.append(txt_extractor.extract_base_col())
+            results.append(
+                await blocking_func_to_async(
+                    self._executor,
+                    txt_extractor.extract_base_col,
+                )
+            )
         df1 = pd.DataFrame(results)
         # excel_directory = os.path.dirname(self._tmp_excel_path)
         if not os.path.exists(self._tmp_excel_path):
@@ -417,7 +435,13 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
         df2 = pd.DataFrame(columns=all_list)
         for file_name in file_names:
             txt_extracter = FinTableExtractor(file_name)
-            results.append(txt_extracter.extract_fin_data())
+            # results.append(txt_extracter.extract_fin_data())
+            results.append(
+                await blocking_func_to_async(
+                    self._executor,
+                    txt_extracter.extract_fin_data,
+                )
+            )
         df2 = pd.DataFrame(results)
         df2.to_excel(self._tmp_excel_path + "/table_data_fin_info.xlsx", index=False)
         # process other col
@@ -463,7 +487,13 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
         )
         for file_name in file_names:
             txt_extracter = FinTableExtractor(file_name)
-            results.append(txt_extracter.extract_other_col())
+            # results.append(txt_extracter.extract_other_col())
+            results.append(
+                await blocking_func_to_async(
+                    self._executor,
+                    txt_extracter.extract_other_col,
+                )
+            )
         df3 = pd.DataFrame(results)
         df3.to_excel(self._tmp_excel_path + "/table_data_other_info.xlsx", index=False)
         # check if the three files have the same "文件名" column
@@ -483,88 +513,6 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
         df.to_excel(
             self._tmp_excel_path + "/big_data_old.xlsx", engine="openpyxl", index=False
         )
-        df["行业名称"] = ""
-        new_name_list = {
-            "营业成本率": {
-                "公式": "营业成本率=营业成本/营业收入",
-                "数值": ["营业成本", "营业收入"],
-            },
-            "投资收益占营业收入比率": {
-                "公式": "投资收益占营业收入比率=投资收益/营业收入",
-                "数值": ["投资收益", "营业收入"],
-            },
-            "管理费用率": {
-                "公式": "管理费用率=管理费用/营业收入",
-                "数值": ["管理费用", "营业收入"],
-            },
-            "财务费用率": {
-                "公式": "财务费用率=财务费用/营业收入",
-                "数值": ["财务费用", "营业收入"],
-            },
-            "三费比重": {
-                "公式": "三费比重=(销售费用+管理费用+财务费用)/营业收入",
-                "数值": ["销售费用", "管理费用", "财务费用", "营业收入"],
-            },
-            "企业研发经费占费用比例": {
-                "公式": "企业研发经费占费用比例=研发费用/(销售费用+财务费用+管理费用+研发费用)",
-                "数值": ["研发费用", "销售费用", "财务费用", "管理费用"],
-            },
-            "企业研发经费与利润比值": {
-                "公式": "企业研发经费与利润比值=研发费用/净利润",
-                "数值": ["研发费用", "净利润"],
-            },
-            "企业研发经费与营业收入比值": {
-                "公式": "企业研发经费与营业收入比值=研发费用/营业收入",
-                "数值": ["研发费用", "营业收入"],
-            },
-            "研发人员占职工人数比例": {
-                "公式": "研发人员占职工人数比例=研发人员人数/职工总人数",
-                "数值": ["研发人员人数", "职工总人数"],
-            },
-            "企业硕士及以上人员占职工人数比例": {
-                "公式": "企业硕士及以上人员占职工人数比例=(硕士员工人数 + 博士及以上的员工人数)/职工总人数",
-                "数值": ["硕士员工人数", "博士及以上的员工人数", "职工总人数"],
-            },
-            "毛利率": {
-                "公式": "毛利率=(营业收入-营业成本)/营业收入",
-                "数值": ["营业收入", "营业成本"],
-            },
-            "营业利润率": {
-                "公式": "营业利润率=营业利润/营业收入",
-                "数值": ["营业利润", "营业收入"],
-            },
-            "流动比率": {
-                "公式": "流动比率=流动资产/流动负债",
-                "数值": ["流动资产", "流动负债"],
-            },
-            "速动比率": {
-                "公式": "速动比率=(流动资产-存货)/流动负债",
-                "数值": ["流动资产", "存货", "流动负债"],
-            },
-            "资产负债比率": {
-                "公式": "资产负债比率=总负债/资产总额",
-                "数值": ["总负债", "资产总额"],
-            },
-            "现金比率": {
-                "公式": "现金比率=货币资金/流动负债",
-                "数值": ["货币资金", "流动负债"],
-            },
-            "非流动负债比率": {
-                "公式": "非流动负债比率=非流动负债/总负债",
-                "数值": ["非流动负债", "总负债"],
-            },
-            "流动负债比率": {
-                "公式": "流动负债比率=流动负债/总负债",
-                "数值": ["流动负债", "总负债"],
-            },
-            "净利润率": {
-                "公式": "净利润率=净利润/营业收入",
-                "数值": ["净利润", "营业收入"],
-            },
-        }
-        for new_name in new_name_list:
-            df[new_name] = ""
-        # save the result
         df.to_excel(
             self._tmp_excel_path + "/table_data_final.xlsx",
             engine="openpyxl",
@@ -576,7 +524,19 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
         # get all the txt name
         txt_files = [file for file in os.listdir(txt_folder) if file.endswith(".txt")]
         # process txt
-        for txt_file in tqdm(txt_files, desc="Processing txts"):
+        final_report_df = await blocking_func_to_async(
+            self._executor,
+            self._process_financial_txt,
+            txt_files,
+            txt_folder,
+        )
+
+        knowledge_request["dataframe"] = final_report_df
+        return knowledge_request
+
+    def _process_financial_txt(self, txt_files, txt_folder):
+        final_report_df = None
+        for txt_file in tqdm(txt_files, desc="Processing financial report"):
             # txt path
             txt_path = os.path.join(txt_folder, txt_file)
             # create txt dir
@@ -594,9 +554,8 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
             final_report_df = pd.read_excel(
                 self._tmp_excel_path + "/table_data_final.xlsx"
             )
-            print("process finished!")
-            knowledge_request["dataframe"] = final_report_df
-            return knowledge_request
+            print(f"{txt_path} table -> dataframe process finished!")
+        return final_report_df
 
     def _save_all_text(self, all_text, tmp_txt_path):
         directory = os.path.dirname(tmp_txt_path)
@@ -617,6 +576,7 @@ class DatabaseStorageOperator(MapOperator[Dict, str]):
         conn_database: Optional[RDBMSConnector] = None,
         connector_manager: Optional[ConnectorManager] = None,
         tmp_dir_path: Optional[str] = None,
+        executor: Optional[Executor] = None,
         **kwargs,
     ):
         """Init the datasource operator."""
@@ -625,6 +585,7 @@ class DatabaseStorageOperator(MapOperator[Dict, str]):
         self._connector_manager = connector_manager
         self._conn_database = conn_database
         self._tmp_dir_path = tmp_dir_path
+        self._executor = executor or ThreadPoolExecutor()
 
     async def map(self, knowledge_request: Dict) -> str:
         """Create datasource."""
@@ -683,7 +644,7 @@ class VectorStorageOperator(MapOperator[Dict, List[Chunk]]):
                 vector_store_type=cfg.VECTOR_STORE_TYPE, vector_store_config=config
             )
             vector_store = connector.index_client
-        vector_store.load_document_with_limit(
+        await vector_store.aload_document_with_limit(
             chunks, cfg.KNOWLEDGE_MAX_CHUNKS_ONCE_LOAD
         )
         return chunks

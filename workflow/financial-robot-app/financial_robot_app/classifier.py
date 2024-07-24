@@ -1,10 +1,11 @@
 """The Question Classifier Operator."""
-
+from concurrent.futures import Executor, ThreadPoolExecutor
 from enum import Enum
-from typing import Dict
+from typing import Dict, Optional
 
 import joblib
 import torch
+from dbgpt.util.executor_utils import blocking_func_to_async
 from tqdm import tqdm
 from transformers import AutoModel, AutoTokenizer
 
@@ -69,7 +70,10 @@ class QuestionClassifierOperator(MapOperator[IN, OUT]):
         documentation_url="https://github.com/openai/openai-python",
     )
 
-    def __init__(self, model: str = None, classifier_pkl: str = None, **kwargs):
+    def __init__(self, model: str = None,
+                 classifier_pkl: str = None,
+                 executor: Optional[Executor] = None,
+                 **kwargs):
         """Create a new Question Classifier Operator."""
         if not model:
             raise ValueError("model must be provided")
@@ -82,14 +86,25 @@ class QuestionClassifierOperator(MapOperator[IN, OUT]):
         # self._tokenizer = AutoTokenizer.from_pretrained(self._model)
         self._pkl = classifier_pkl
         self._batch_size = 4
+        self._executor = executor or ThreadPoolExecutor()
         super().__init__(**kwargs)
 
     async def map(self, request: ModelRequest) -> ModelRequest:
         """Map the user question to a financial."""
         if not self._pretrained_model:
-            self._pretrained_model = AutoModel.from_pretrained(self._model)
+            self._pretrained_model = await blocking_func_to_async(
+                self._executor,
+                AutoModel.from_pretrained,
+                self._model
+            )
+            # self._pretrained_model = AutoModel.from_pretrained(self._model)
         if not self._tokenizer:
-            self._tokenizer = AutoTokenizer.from_pretrained(self._model)
+            self._tokenizer = await blocking_func_to_async(
+                self._executor,
+                AutoTokenizer.from_pretrained,
+                self._model
+            )
+            # self._tokenizer = AutoTokenizer.from_pretrained(self._model)
         clf_loaded = joblib.load(self._pkl)
         messages = request.messages
         question = [message.content for message in messages]
