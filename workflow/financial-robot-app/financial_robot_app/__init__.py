@@ -38,7 +38,6 @@ from .intent import FinIntentExtractorOperator
 from .chat_normal import ChatNormalOperator
 
 
-
 class RequestHandleOperator(
     BaseConversationOperator, MapOperator[CommonLLMHttpRequestBody, ModelRequest]
 ):
@@ -131,9 +130,7 @@ with DAG(
     request_handle_task = RequestHandleOperator(storage)
     fin_intent_task = FinIntentExtractorOperator(llm_client=llm_client)
     # query classifier
-    query_classifier = QuestionClassifierOperator(
-        model=CFG.FIN_REPORT_MODEL, classifier_pkl=CFG.FIN_CLASSIFIER_PKL
-    )
+    query_classifier = QuestionClassifierOperator(model=CFG.FIN_REPORT_MODEL)
     classifier_branch = QuestionClassifierBranchOperator()
     chat_data_task = ChatDataOperator()
     llm_task = LLMOperator()

@@ -72,7 +72,6 @@ class ChatKnowledgeOperator(MapOperator[ModelRequest, ModelRequest]):
         from dbgpt.rag.embedding.embedding_factory import EmbeddingFactory
         from dbgpt.storage.vector_store.base import VectorStoreConfig
 
-
         user_input = input_value.messages[-1].content
         user_inputs = [user_input]
         knowledge_name = self._knowledge_space or input_value.context.extra.get("space")
@@ -124,16 +123,20 @@ class ChatKnowledgeOperator(MapOperator[ModelRequest, ModelRequest]):
         chunks = []
         for query_text in user_inputs:
             if metadata_filter:
-                chunks.extend(await embedding_retriever.aretrieve_with_scores(
-                    query_text,
-                    0.3,
-                    MetadataFilters(filters=[metadata_filter]),
-                ))
+                chunks.extend(
+                    await embedding_retriever.aretrieve_with_scores(
+                        query_text,
+                        0.3,
+                        MetadataFilters(filters=[metadata_filter]),
+                    )
+                )
             else:
-                chunks.extend(await embedding_retriever.aretrieve_with_scores(
-                    query_text,
-                    0.3,
-                ))
+                chunks.extend(
+                    await embedding_retriever.aretrieve_with_scores(
+                        query_text,
+                        0.3,
+                    )
+                )
         contents = [doc.content for doc in chunks]
         context = "\n".join(set(contents))
 

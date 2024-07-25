@@ -1,10 +1,11 @@
 """The Question Classifier Operator."""
+
 from concurrent.futures import Executor, ThreadPoolExecutor
 from enum import Enum
-from typing import Dict, Optional
+from typing import Dict, Optional, List
+import os
 
 import joblib
-import torch
 from dbgpt.util.executor_utils import blocking_func_to_async
 from tqdm import tqdm
 from transformers import AutoModel, AutoTokenizer
@@ -70,70 +71,87 @@ class QuestionClassifierOperator(MapOperator[IN, OUT]):
         documentation_url="https://github.com/openai/openai-python",
     )
 
-    def __init__(self, model: str = None,
-                 classifier_pkl: str = None,
-                 executor: Optional[Executor] = None,
-                 **kwargs):
+    def __init__(
+        self,
+        model: str = None,
+        adapter_model_path: str = None,
+        device: Optional[str] = None,
+        executor: Optional[Executor] = None,
+        **kwargs,
+    ):
         """Create a new Question Classifier Operator."""
         if not model:
             raise ValueError("model must be provided")
-        if not classifier_pkl:
-            raise ValueError("classifier_pkl must be provided")
+        if not adapter_model_path:
+
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            adapter_model_path = os.path.join(
+                current_dir, "models", "dbgpt-hub-nlu-v0.1"
+            )
+        if not device:
+            from dbgpt.configs.model_config import get_device
+
+            device = get_device()
+
         self._model = model
         self._pretrained_model = None
         self._tokenizer = None
-        # self._pretrained_model = AutoModel.from_pretrained(self._model)
-        # self._tokenizer = AutoTokenizer.from_pretrained(self._model)
-        self._pkl = classifier_pkl
+        self._adapter_model = None
+        self._adapter_model_path = adapter_model_path
+        self._device = device
         self._batch_size = 4
         self._executor = executor or ThreadPoolExecutor()
         super().__init__(**kwargs)
 
     async def map(self, request: ModelRequest) -> ModelRequest:
         """Map the user question to a financial."""
+        question = request.messages[-1].content
+        # check and load models
+        await self._init_models()
+
+        predictions = await blocking_func_to_async(
+            self._executor, self._predict, [question]
+        )
+        if not request.context.extra:
+            request.context.extra = {}
+        request.context.extra["classifier"] = FinQuestionClassifierType.get_by_value(
+            predictions[0]
+        )
+        return request
+
+    def _predict(self, texts: List[str]) -> List[str]:
+        from .model import batch_sentence_embeddings
+
+        input_ids = batch_sentence_embeddings(
+            texts, self._tokenizer, self._pretrained_model, self._device
+        )
+        predictions, _ = self._adapter_model.predict(input_ids, self._device)
+        return predictions
+
+    async def _init_models(self):
         if not self._pretrained_model:
             self._pretrained_model = await blocking_func_to_async(
-                self._executor,
-                AutoModel.from_pretrained,
-                self._model
+                self._executor, AutoModel.from_pretrained, self._model
             )
-            # self._pretrained_model = AutoModel.from_pretrained(self._model)
+            self._pretrained_model = self._pretrained_model.to(self._device)
+            self._pretrained_model.eval()
         if not self._tokenizer:
             self._tokenizer = await blocking_func_to_async(
                 self._executor,
                 AutoTokenizer.from_pretrained,
-                self._model
+                self._model,
+                map_location=self._device,
             )
-            # self._tokenizer = AutoTokenizer.from_pretrained(self._model)
-        clf_loaded = joblib.load(self._pkl)
-        messages = request.messages
-        question = [message.content for message in messages]
-        new_text = question
-        new_embedding = self._get_sentence_embeddings(new_text).numpy()
-        prediction = clf_loaded.predict(new_embedding)
-        classifiers = FinQuestionClassifierType.get_by_value(prediction[0])
-        if not request.context.extra:
-            request.context.extra = {}
-        request.context.extra["classifier"] = classifiers
-        return request
+        if not self._adapter_model:
+            from .model import SimpleIntentClassifier
 
-    def _get_sentence_embeddings(self, sentences):
-        embeddings = []
-        for i in tqdm(
-            range(0, len(sentences), self._batch_size), desc="Generating Embeddings"
-        ):
-            batch = sentences[i: i + self._batch_size]
-            encoded_input = self._tokenizer(
-                batch, padding=True, truncation=True, return_tensors="pt"
+            self._adapter_model = await blocking_func_to_async(
+                self._executor,
+                SimpleIntentClassifier.from_pretrained,
+                self._adapter_model_path,
             )
-            with torch.no_grad():
-                model_output = self._pretrained_model(**encoded_input)
-                sentence_embeddings = model_output[0][:, 0]
-                sentence_embeddings = torch.nn.functional.normalize(
-                    sentence_embeddings, p=2, dim=1
-                )
-                embeddings.append(sentence_embeddings)
-        return torch.cat(embeddings)
+            self._adapter_model = self._adapter_model.to(self._device)
+            self._adapter_model.eval()
 
 
 class QuestionClassifierBranchOperator(BranchOperator[ModelRequest, ModelRequest]):
