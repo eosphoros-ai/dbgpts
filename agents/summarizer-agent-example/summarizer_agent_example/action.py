@@ -1,10 +1,6 @@
 from typing import Optional
-from dbgpt.agent import (
-    Action,
-    ActionOutput,
-    AgentResource,
-    ResourceType,
-)
+
+from dbgpt.agent import Action, ActionOutput, AgentResource, ResourceType
 from dbgpt.agent.util import cmp_string_equal
 from dbgpt.vis import Vis
 from pydantic import BaseModel, Field

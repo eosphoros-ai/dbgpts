@@ -1,22 +1,21 @@
 """The ChatDatabaseOperator."""
 
 import json
-from typing import Optional
+from typing import Dict, Tuple
 
-from dbgpt._private.config import Config
 from dbgpt.core import (
     ChatPromptTemplate,
     HumanPromptTemplate,
     ModelMessage,
-    ModelOutput,
     ModelRequest,
-    SQLOutputParser,
-    SystemPromptTemplate,
 )
 from dbgpt.core.awel import MapOperator
 from dbgpt.core.awel.flow import IOField, OperatorCategory, Parameter, ViewMetadata
 from dbgpt.datasource.rdbms.base import RDBMSConnector
 from dbgpt.util.i18n_utils import _
+
+from .common import FinConfigMixin
+from .intent import FinReportIntent
 
 _DEFAULT_TEMPLATE_EN = """You are a database expert. Please answer the user's question 
 based on the database selected by the user and some of the available table structure 
@@ -183,7 +182,7 @@ fin_indicator_map = {
 _SHARE_DATA_DATABASE_NAME_KEY = "__database_name__"
 
 
-class ChatIndicatorOperator(MapOperator[ModelRequest, ModelRequest]):
+class ChatIndicatorOperator(FinConfigMixin, MapOperator[ModelRequest, ModelRequest]):
     """The ChatDataOperator."""
 
     metadata = ViewMetadata(
@@ -223,42 +222,46 @@ class ChatIndicatorOperator(MapOperator[ModelRequest, ModelRequest]):
     def __init__(
         self,
         task_name="chat_indicator",
-        db_name: Optional[str] = None,
-        conn_datasource: Optional[RDBMSConnector] = None,
         **kwargs,
     ):
         """Create a new ChatDataOperator."""
-        self._conn_datasource = conn_datasource
-        self._intent = None
-        self._cfg = Config()
-
-        self._db_name = db_name
-        super().__init__(task_name=task_name, **kwargs)
+        MapOperator.__init__(self, task_name=task_name, **kwargs)
 
     async def map(self, input_value: ModelRequest) -> ModelRequest:
         """Map the input value to the output value."""
-        from dbgpt.rag.summary.db_summary_client import DBSummaryClient
         from dbgpt.vis.tags.vis_chart import default_chart_type_prompt
 
-        self._intent = input_value.context.extra.get("intent")
-        self._db_name = input_value.context.extra.get("db_name")
-        self._database = self._cfg.local_db_manager.get_connector(self._db_name)
+        intent: FinReportIntent = input_value.context.extra.get("intent")
+        (
+            db_name,
+            space_name,
+            tmp_dir_path,
+            embedding_model,
+        ) = await self._get_chat_config()
 
-        await self.current_dag_context.save_to_share_data(
-            _SHARE_DATA_DATABASE_NAME_KEY, self._db_name
+        # Cached connection
+        db_conn: RDBMSConnector = await self.get_connector(
+            space_name, db_name, tmp_dir_path
         )
-        client = DBSummaryClient(system_app=self.system_app)
+
         # user_input = input_value.messages[-1].content
-        indicator, user_input = self._get_indicator(input_value.messages[-1].content)
-        table_infos = await self.blocking_func_to_async(
-            client.get_db_summary, self._db_name, user_input, 5
+        indicator, user_input = await self.blocking_func_to_async(
+            self._get_indicator, input_value.messages[-1].content, db_conn, intent
+        )
+
+        table_infos = await self.get_db_summary(
+            db_name,
+            tmp_dir_path,
+            user_input,
+            5,
+            embedding_model=embedding_model,
         )
 
         input_values = {
-            "db_name": self._db_name,
+            "db_name": db_name,
             "user_input": user_input,
             "top_k": 5,
-            "dialect": self._database.dialect,
+            "dialect": db_conn.dialect,
             "table_info": table_infos,
             "indicator": indicator.get("公式"),
             "display_type": default_chart_type_prompt(),
@@ -292,112 +295,27 @@ class ChatIndicatorOperator(MapOperator[ModelRequest, ModelRequest]):
         request.messages = model_messages
         return request
 
-    def _get_indicator(self, user_input):
+    def _get_indicator(
+        self, user_input: str, db_conn: RDBMSConnector, intent: FinReportIntent
+    ) -> Tuple[Dict, str]:
         """Get indicator from user input."""
-        company_df = self._database.run_to_df(f"select 公司名称_x from fin_report")
+        company_df = db_conn.run_to_df(f"select 公司名称_x from fin_report")
         company_list = [
             item[0] for item in company_df.values.tolist() if item is not None
         ]
-        if self._intent.company:
+        if intent.company:
             from fuzzywuzzy import process
 
-            best_match, confidence = process.extractOne(
-                self._intent.company, company_list
-            )
-            hit_company = best_match or self._intent.company
-            new_query = user_input.replace(self._intent.company, hit_company)
+            best_match, confidence = process.extractOne(intent.company, company_list)
+            hit_company = best_match or intent.company
+            new_query = user_input.replace(intent.company, hit_company)
             user_input = new_query
         indicator = {}
-        if self._intent.intent:
+        if intent.intent:
             intent_list = list(fin_indicator_map.keys())
             from fuzzywuzzy import process
 
-            best_match, confidence = process.extractOne(
-                self._intent.intent, intent_list
-            )
-            hit_indicator = best_match or self._intent.intent
+            best_match, confidence = process.extractOne(intent.intent, intent_list)
+            hit_indicator = best_match or intent.intent
             indicator = fin_indicator_map.get(hit_indicator)
         return indicator, user_input
-
-
-# class ChatDatabaseOutputParserOperator(SQLOutputParser):
-#     """ChatDatabaseOutputParserOperator."""
-#
-#     metadata = ViewMetadata(
-#         label=_("Chat Data Output Operator"),
-#         name="chat_data_out_parser_operator",
-#         category=OperatorCategory.EXPERIMENTAL,
-#         description=_(_("Chat Data Output Operator.")),
-#         inputs=[
-#             IOField.build_from(
-#                 _("model output"),
-#                 "model_output",
-#                 ModelOutput,
-#                 description=_("model output."),
-#             )
-#         ],
-#         outputs=[
-#             IOField.build_from(
-#                 _("dict"),
-#                 "dict",
-#                 dict,
-#                 description=_("dict."),
-#             )
-#         ],
-#         parameters=[],
-#         documentation_url="https://github.com/openai/openai-python",
-#     )
-#
-#     async def map(self, input_value: ModelOutput) -> dict:
-#         """Map the input value to the output value."""
-#         return self.parse_model_nostream_resp(input_value, "#########")
-#
-#
-# class ChatDatabaseChartOperator(MapOperator[dict, str]):
-#     """The ChatDatabaseChartOperator."""
-#
-#     metadata = ViewMetadata(
-#         label=_("Chat Data Chart Operator"),
-#         name="chat_data_chart_operator",
-#         category=OperatorCategory.EXPERIMENTAL,
-#         description=_(_("Chat Data Output Operator.")),
-#         inputs=[
-#             IOField.build_from(
-#                 _("dict"),
-#                 "dict",
-#                 dict,
-#                 description=_("dict."),
-#             )
-#         ],
-#         outputs=[
-#             IOField.build_from(
-#                 _("str"),
-#                 "str",
-#                 str,
-#                 description=_("dict."),
-#             )
-#         ],
-#         parameters=[],
-#         documentation_url="https://github.com/openai/openai-python",
-#     )
-#
-#     def __init__(self, task_name="chat_database_parser", **kwargs):
-#         """Create a new ChatDatabaseChartOperator."""
-#         super().__init__(task_name=task_name, **kwargs)
-#
-#     async def map(self, input_value: dict) -> str:
-#         """Map the input value to the output value."""
-#         from dbgpt._private.config import Config
-#         from dbgpt.datasource import RDBMSConnector
-#         from dbgpt.vis.tags.vis_chart import VisChart
-#
-#         db_name = await self.current_dag_context.get_from_share_data(
-#             _SHARE_DATA_DATABASE_NAME_KEY
-#         )
-#         vis = VisChart()
-#         cfg = Config()
-#         database: RDBMSConnector = cfg.local_db_manager.get_connector(db_name)
-#         sql = input_value.get("sql")
-#         data_df = await self.blocking_func_to_async(database.run_to_df, sql)
-#         view = await vis.display(chart=input_value, data_df=data_df)
-#         return view

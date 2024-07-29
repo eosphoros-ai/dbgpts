@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Tuple, List
+from typing import Dict, List, Tuple
 
 import torch
 from torch import nn

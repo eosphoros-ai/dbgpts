@@ -1,42 +1,143 @@
 import glob
 import json
+import logging
 import os
 import uuid
+from abc import ABC
 from concurrent.futures import Executor, ThreadPoolExecutor
-from typing import Optional, List, Dict, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 from dbgpt._private.config import Config
-from dbgpt.configs.model_config import PILOT_PATH, EMBEDDING_MODEL_CONFIG
-from dbgpt.core.awel.trigger.http_trigger import HttpTrigger
-from dbgpt.rag.embedding import EmbeddingFactory
-from dbgpt.serve.rag.connector import VectorStoreConnector
-from dbgpt.storage.vector_store.base import VectorStoreConfig
-from dbgpt.util.executor_utils import blocking_func_to_async
-from pandas import DataFrame
-from pydantic import BaseModel, Field
-from tqdm import tqdm
-
-from dbgpt.core import Document, Chunk
+from dbgpt._private.pydantic import BaseModel, Field
+from dbgpt.core import Chunk, Document
 from dbgpt.core.awel import (
-    MapOperator,
-    BranchOperator,
+    DAG,
+    BaseOperator,
     BranchFunc,
+    BranchOperator,
     BranchTaskType,
     JoinOperator,
-    DAG,
-    logger,
+    MapOperator,
 )
+from dbgpt.core.awel.trigger.http_trigger import HttpTrigger
 from dbgpt.datasource.db_conn_info import DBConfig
-from dbgpt.datasource.manages import ConnectorManager
 from dbgpt.datasource.rdbms.base import RDBMSConnector
 from dbgpt.datasource.rdbms.conn_sqlite import SQLiteConnector
 from dbgpt.rag import ChunkParameters
 from dbgpt.rag.chunk_manager import ChunkManager
+from dbgpt.rag.embedding import EmbeddingFactory, Embeddings
 from dbgpt.rag.index.base import IndexStoreBase
 from dbgpt.rag.knowledge.base import Knowledge, KnowledgeType
+from dbgpt.storage.vector_store.base import VectorStoreConfig
+from dbgpt.util.executor_utils import blocking_func_to_async
+from pandas import DataFrame
+from tqdm import tqdm
+
 from .extract import FinTableExtractor, FinTableProcessor
 from .fin_knowledge import FinReportKnowledge
+
+logger = logging.getLogger(__name__)
+
+
+class RAGMixin(BaseOperator, ABC):
+    _EMBEDDINGS_CACHE_KEY = "__embeddings__"
+    _VECTOR_STORE_CACHE_KEY = "__vector_store__"
+
+    async def get_embeddings(
+        self,
+        embedding_model: Optional[str] = None,
+    ) -> Embeddings:
+        from dbgpt.configs.model_config import EMBEDDING_MODEL_CONFIG, get_device
+
+        embeddings = await self.current_dag_context.get_from_share_data(
+            RAGMixin._EMBEDDINGS_CACHE_KEY
+        )
+        if embeddings:
+            return embeddings
+
+        if not self.dev_mode:
+            cfg = Config()
+            embedding_factory = EmbeddingFactory.get_instance(self.system_app)
+            embeddings = embedding_factory.create(
+                model_name=EMBEDDING_MODEL_CONFIG[cfg.EMBEDDING_MODEL]
+            )
+        else:
+            from dbgpt.rag.embedding import DefaultEmbeddingFactory
+
+            embeddings = DefaultEmbeddingFactory.default(
+                embedding_model, device=get_device()
+            )
+        await self.current_dag_context.save_to_share_data(
+            RAGMixin._EMBEDDINGS_CACHE_KEY, embeddings
+        )
+        return embeddings
+
+    async def get_vector_store(
+        self, space_name: str, tmp_dir_path: str, embedding_model: Optional[str] = None
+    ) -> IndexStoreBase:
+        cached_key = f"{RAGMixin._VECTOR_STORE_CACHE_KEY}_{space_name}"
+
+        index_store = await self.current_dag_context.get_from_share_data(cached_key)
+        if index_store:
+            return index_store
+        embeddings = await self.get_embeddings(embedding_model)
+
+        if not self.dev_mode:
+            # Run this code in DB-GPT
+            from dbgpt.configs.model_config import EMBEDDING_MODEL_CONFIG
+            from dbgpt.serve.rag.connector import VectorStoreConnector
+
+            cfg = Config()
+
+            config = VectorStoreConfig(
+                name=space_name,
+                embedding_fn=embeddings,
+            )
+            connector = VectorStoreConnector(
+                vector_store_type=cfg.VECTOR_STORE_TYPE, vector_store_config=config
+            )
+            index_store = connector.index_client
+        else:
+            from dbgpt.storage.vector_store.chroma_store import (
+                ChromaStore,
+                ChromaVectorConfig,
+            )
+
+            index_store = ChromaStore(
+                vector_store_config=ChromaVectorConfig(
+                    name=space_name,
+                    persist_path=os.path.join(tmp_dir_path, space_name),
+                    embedding_fn=embeddings,
+                ),
+            )
+        await self.current_dag_context.save_to_share_data(cached_key, index_store)
+        return index_store
+
+    async def save_database_profile(
+        self, db_name: str, connector: RDBMSConnector, tmp_dir_path: str
+    ):
+        vector_store_name = db_name + "_profile"
+
+        index_store = await self.get_vector_store(vector_store_name, tmp_dir_path)
+        await self.blocking_func_to_async(
+            self._save_to_vector_store, connector, index_store
+        )
+
+    def _save_to_vector_store(
+        self, connector: RDBMSConnector, index_store: IndexStoreBase
+    ):
+        from dbgpt.rag.assembler.db_schema import DBSchemaAssembler
+
+        db_assembler = DBSchemaAssembler.load_from_connection(
+            connector=connector,
+            index_store=index_store,
+            chunk_parameters=ChunkParameters(chunk_strategy="CHUNK_BY_SIZE"),
+        )
+        if len(db_assembler.get_chunks()) > 0:
+            db_assembler.persist()
+        else:
+            logger.info("No chunks found in DBSchemaAssembler")
 
 
 class KnowledgeLoaderOperator(MapOperator[Dict, Dict]):
@@ -80,7 +181,7 @@ class FinTextExtractOperator(MapOperator[Dict, Dict]):
         self._chunk_parameters = chunk_parameters or "./tmp"
         super().__init__(task_name=task_name, **kwargs)
 
-    def map(self, knowledge_request: Dict) -> Dict:
+    async def map(self, knowledge_request: Dict) -> Dict:
         knowledge = knowledge_request.get("knowledge")
         merged_data = {}
         chunk_manager = ChunkManager(
@@ -502,13 +603,9 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
             or "文件名" not in df2.columns
             or "文件名" not in df3.columns
         ):
-            raise ValueError(
-                "One of the Excel files does not have the '文件名' column."
-            )
+            raise ValueError("One of the Excel files does not have the '文件名' column.")
         # merge to DataFrame
-        df = df1.merge(df2, on="文件名", how="inner").merge(
-            df3, on="文件名", how="inner"
-        )
+        df = df1.merge(df2, on="文件名", how="inner").merge(df3, on="文件名", how="inner")
         # to excel
         df.to_excel(
             self._tmp_excel_path + "/big_data_old.xlsx", engine="openpyxl", index=False
@@ -567,22 +664,20 @@ class FinTableExtractorOperator(MapOperator[str, DataFrame]):
         logger.info(f"save all text to txt {directory} file finished.")
 
 
-class DatabaseStorageOperator(MapOperator[Dict, str]):
+class DatabaseStorageOperator(RAGMixin, MapOperator[Dict, str]):
     """Database Storage Operator."""
 
     def __init__(
         self,
         db_config: Optional[DBConfig] = None,
         conn_database: Optional[RDBMSConnector] = None,
-        connector_manager: Optional[ConnectorManager] = None,
         tmp_dir_path: Optional[str] = None,
         executor: Optional[Executor] = None,
         **kwargs,
     ):
         """Init the datasource operator."""
-        super().__init__(**kwargs)
+        MapOperator.__init__(self, **kwargs)
         self._db_config = db_config
-        self._connector_manager = connector_manager
         self._conn_database = conn_database
         self._tmp_dir_path = tmp_dir_path
         self._executor = executor or ThreadPoolExecutor()
@@ -591,13 +686,18 @@ class DatabaseStorageOperator(MapOperator[Dict, str]):
         """Create datasource."""
         dataframe: DataFrame = knowledge_request.get("dataframe")
         space = knowledge_request.get("space")
+        db_name = f"{space}_fin_report"
+
+        tmp_dir_path = self._tmp_dir_path or "./tmp"
+        sqlite_path = os.path.join(tmp_dir_path, space, f"{db_name}.db")
+
         self._conn_database = self._conn_database or SQLiteConnector.from_file_path(
-            (self._tmp_dir_path or "./tmp") + f"/{space}/fin_report.db"
+            sqlite_path
         )
         self._db_config = DBConfig(
-            db_name=f"{space}_fin_report",
+            db_name=db_name,
             db_type=self._conn_database.db_type,
-            file_path=(self._tmp_dir_path or "./tmp") + f"/{space}/fin_report.db",
+            file_path=sqlite_path,
         )
         if self._conn_database:
             dataframe.to_sql(
@@ -606,47 +706,48 @@ class DatabaseStorageOperator(MapOperator[Dict, str]):
                 if_exists="append",
                 index=False,
             )
-            db_list = [
-                item["db_name"] for item in self._connector_manager.get_db_list()
-            ]
+        if not self.dev_mode:
+            from dbgpt.datasource.manages import ConnectorManager
+
+            connector_manager = ConnectorManager.get_instance(self.system_app)
+            db_list = [item["db_name"] for item in connector_manager.get_db_list()]
             if self._db_config.db_name not in db_list:
-                self._connector_manager.add_db(self._db_config)
-        return (self._tmp_dir_path or "./tmp") + f"/{space}/fin_report.db"
+                connector_manager.add_db(self._db_config)
+        else:
+            await self.save_database_profile(db_name, self._conn_database, tmp_dir_path)
+        return sqlite_path
 
 
-class VectorStorageOperator(MapOperator[Dict, List[Chunk]]):
+class VectorStorageOperator(RAGMixin, MapOperator[Dict, List[Chunk]]):
     """Vector Storage Operator."""
 
-    def __init__(self, index_store: Optional[IndexStoreBase] = None, **kwargs):
+    def __init__(
+        self,
+        tmp_dir_path: Optional[str] = None,
+        index_store: Optional[IndexStoreBase] = None,
+        embeddings: Optional[Embeddings] = None,
+        max_chunks_once_load: Optional[int] = None,
+        **kwargs,
+    ):
         """Init the datasource operator."""
-        super().__init__(**kwargs)
+        MapOperator.__init__(self, **kwargs)
+        self._tmp_dir_path = tmp_dir_path
         self._index_store = index_store
+        self._embeddings = embeddings
+        self._max_chunks_once_load = max_chunks_once_load
 
     async def map(self, storage_request: Dict) -> List[Chunk]:
         """Persist chunks in vector db."""
         chunks = storage_request.get("chunks")
-        vector_store: IndexStoreBase = self._index_store
-        cfg = Config()
-        if not vector_store:
-            space_name = storage_request.get("space")
-            embedding_factory = self.system_app.get_component(
-                "embedding_factory", EmbeddingFactory
-            )
-            embedding_fn = embedding_factory.create(
-                model_name=EMBEDDING_MODEL_CONFIG[cfg.EMBEDDING_MODEL]
-            )
-
-            config = VectorStoreConfig(
-                name=space_name,
-                embedding_fn=embedding_fn,
-            )
-            connector = VectorStoreConnector(
-                vector_store_type=cfg.VECTOR_STORE_TYPE, vector_store_config=config
-            )
-            vector_store = connector.index_client
-        await vector_store.aload_document_with_limit(
-            chunks, cfg.KNOWLEDGE_MAX_CHUNKS_ONCE_LOAD
+        vector_store = await self.get_vector_store(
+            storage_request["space"],
+            self._tmp_dir_path,
+            storage_request["embedding_model"],
         )
+        max_chunks_once_load = self._max_chunks_once_load or int(
+            os.getenv("KNOWLEDGE_MAX_CHUNKS_ONCE_LOAD", 10)
+        )
+        await vector_store.aload_document_with_limit(chunks, max_chunks_once_load)
         return chunks
 
 
@@ -712,8 +813,9 @@ class FinKnowledgeJoinOperator(JoinOperator[List[str]]):
 
 
 class TriggerReqBody(BaseModel):
-    space: str = Field(None, description="space")
-    file_path: int = Field(None, description="file path")
+    space: str | None = Field(None, description="space")
+    file_path: str | None = Field(None, description="file path")
+    embedding_model: str | None = Field(None, description="embedding model path")
 
 
 class RequestHandleOperator(MapOperator[TriggerReqBody, Dict]):
@@ -721,32 +823,49 @@ class RequestHandleOperator(MapOperator[TriggerReqBody, Dict]):
         super().__init__(**kwargs)
 
     async def map(self, input_value: TriggerReqBody) -> Dict:
+        if isinstance(input_value, dict):
+            input_value = TriggerReqBody(**input_value)
         print(f"Receive input value: {input_value}")
-        return {"space": input_value["space"], "datasource": input_value["file_path"]}
+        return {
+            "space": input_value.space,
+            "datasource": input_value.file_path,
+            "embedding_model": input_value.embedding_model,
+        }
 
 
 with DAG(
     "fin_report_knowledge_processing_task",
     tags={"knowledge_factory_domain_type": "FinancialReport"},
 ) as dag:
-    trigger = HttpTrigger("/dbgpts/fin_knowledge_process", request_body=TriggerReqBody)
+    dev_mode = dag.dev_mode
+
+    trigger = HttpTrigger(
+        "/dbgpts/fin_knowledge_process", methods="POST", request_body=TriggerReqBody
+    )
     request_task = RequestHandleOperator()
-    cfg = Config()
-    local_db_manager = cfg.local_db_manager
-    tmp_dir_path = f"{PILOT_PATH}/data/"
+
+    if dev_mode:
+        tmp_dir_path = f"./output"
+    else:
+        # Run this code in DB-GPT
+        from dbgpt.configs.model_config import PILOT_PATH
+
+        tmp_dir_path = f"{PILOT_PATH}/data/"
     knowledge_factory = KnowledgeLoaderOperator()
     extract_branch = KnowledgeExtractBranchOperator(
         text_task_name="extract_text_task", table_task_name="extract_table_task"
     )
     chunk_parameters = ChunkParameters(chunk_strategy="Automatic")
     extract_text_task = FinTextExtractOperator(chunk_parameters=chunk_parameters)
-    vector_storage = VectorStorageOperator(index_store=None)
+    vector_storage = VectorStorageOperator(tmp_dir_path=tmp_dir_path)
     extractor_table_task = FinTableExtractorOperator(tmp_dir_path=tmp_dir_path)
     database_storage = DatabaseStorageOperator(
-        connector_manager=local_db_manager,
         tmp_dir_path=tmp_dir_path,
     )
     result_join_task = FinKnowledgeJoinOperator()
     trigger >> request_task >> knowledge_factory >> extract_branch
     extract_branch >> extract_text_task >> vector_storage >> result_join_task
     extract_branch >> extractor_table_task >> database_storage >> result_join_task
+
+if __name__ == "__main__":
+    pass

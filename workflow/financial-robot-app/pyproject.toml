@@ -8,6 +8,9 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.8"
 
+[tool.poetry.group.dev.dependencies]
+
+financial-report-knowledge-factory = {path = "../financial-report-knowledge-factory", develop = true}
 
 [build-system]
 requires = ["poetry-core"]

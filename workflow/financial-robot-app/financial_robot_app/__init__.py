@@ -1,50 +1,50 @@
 """FinReportJoinOperator."""
 
-from typing import List
+import os
+from typing import List, Optional
 
-from dbgpt._private.config import Config
-from dbgpt.component import ComponentType
 from dbgpt.core import (
+    BaseMessage,
+    InMemoryStorage,
+    LLMClient,
     ModelMessage,
     ModelRequest,
-    StorageInterface,
-    InMemoryStorage,
     StorageConversation,
-    BaseMessage,
+    StorageInterface,
 )
 from dbgpt.core.awel import (
+    DAG,
     CommonLLMHttpRequestBody,
     JoinOperator,
     MapOperator,
     is_empty_data,
-    DAG,
 )
 from dbgpt.core.awel.flow import IOField, OperatorCategory, ViewMetadata
 from dbgpt.core.awel.trigger.http_trigger import CommonLLMHttpTrigger
 from dbgpt.core.interface.operators.message_operator import BaseConversationOperator
-from dbgpt.model import DefaultLLMClient
-from dbgpt.model.cluster import WorkerManagerFactory
-from dbgpt.model.operators import StreamingLLMOperator, LLMOperator
+from dbgpt.model.operators import LLMOperator, StreamingLLMOperator
 
-from .chat_database import (
-    ChatDataOperator,
-    ChatDatabaseChartOperator,
-    ChatDatabaseOutputParserOperator,
-)
+from .chat_database import ChatDatabaseChartOperator, ChatDatabaseOutputParserOperator
 from .chat_indicator import ChatIndicatorOperator
 from .chat_knowledge import ChatKnowledgeOperator
-from .classifier import QuestionClassifierOperator, QuestionClassifierBranchOperator
-from .intent import FinIntentExtractorOperator
 from .chat_normal import ChatNormalOperator
+from .classifier import QuestionClassifierBranchOperator, QuestionClassifierOperator
+from .common import FinConfigMixin
+from .intent import FinIntentExtractorOperator
 
 
 class RequestHandleOperator(
-    BaseConversationOperator, MapOperator[CommonLLMHttpRequestBody, ModelRequest]
+    FinConfigMixin,
+    BaseConversationOperator,
+    MapOperator[CommonLLMHttpRequestBody, ModelRequest],
 ):
     """RequestHandleOperator."""
 
-    def __init__(self, storage: StorageInterface, **kwargs):
+    def __init__(
+        self, storage: StorageInterface, tmp_dir_path: Optional[str] = None, **kwargs
+    ):
         """Create a new RequestHandleOperator."""
+        self._tmp_dir_path = tmp_dir_path
         MapOperator.__init__(self, **kwargs)
         BaseConversationOperator.__init__(
             self, storage=storage, message_storage=storage
@@ -75,6 +75,18 @@ class RequestHandleOperator(
         )
         model_request = ModelRequest.build_request(input_value.model, messages)
         model_request.context.extra = input_value.extra
+
+        db_name = input_value.context.extra.get("db_name")
+        space = input_value.context.extra.get("space")
+        embedding_model = input_value.context.extra.get("embedding_model")
+
+        # Save config for the child operators
+        await self._save_chat_config(
+            db_name=db_name,
+            space_name=space,
+            embedding_model=embedding_model,
+            tmp_dir_path=self._tmp_dir_path,
+        )
         return model_request
 
 
@@ -118,24 +130,32 @@ with DAG(
         methods="POST",
         streaming_predict_func=lambda x: x.stream,
     )
-    CFG = Config()
-    worker_manager_factory: WorkerManagerFactory = CFG.SYSTEM_APP.get_component(
-        ComponentType.WORKER_MANAGER_FACTORY,
-        WorkerManagerFactory,
-        default_component=None,
-    )
-    if worker_manager_factory:
-        llm_client = DefaultLLMClient(worker_manager_factory.create())
+    dev_mode = dag.dev_mode
+
+    llm_client: Optional[LLMClient] = None
+    if dev_mode:
+        from dbgpt.model.proxy import OpenAILLMClient
+
+        llm_client = OpenAILLMClient(
+            model_alias="gpt-4o",
+            api_base=os.getenv("OPENAI_API_BASE"),
+            api_key=os.getenv("OPENAI_API_KEY"),
+        )
+        tmp_dir_path = os.getenv("TMP_DIR_PATH", "./output")
+    else:
+        # Run this code in DB-GPT
+        from dbgpt.configs.model_config import PILOT_PATH
+
+        tmp_dir_path = f"{PILOT_PATH}/data/"
+
+    fin_report_model = os.getenv("FIN_REPORT_MODEL", "BAAI/bge-large-zh-v1.5")
+
     storage = InMemoryStorage()
-    request_handle_task = RequestHandleOperator(storage)
-    fin_intent_task = FinIntentExtractorOperator(llm_client=llm_client)
+    request_handle_task = RequestHandleOperator(storage, tmp_dir_path=tmp_dir_path)
+    fin_intent_task = FinIntentExtractorOperator(default_client=llm_client)
     # query classifier
-    query_classifier = QuestionClassifierOperator(model=CFG.FIN_REPORT_MODEL)
+    query_classifier = QuestionClassifierOperator(model=fin_report_model)
     classifier_branch = QuestionClassifierBranchOperator()
-    chat_data_task = ChatDataOperator()
-    llm_task = LLMOperator()
-    sql_parse_task = ChatDatabaseOutputParserOperator()
-    sql_chart_task = ChatDatabaseChartOperator()
     indicator_task = ChatIndicatorOperator()
     chat_normal_task = ChatNormalOperator()
     indicator_llm_task = LLMOperator()
@@ -155,15 +175,6 @@ with DAG(
         >> fin_intent_task
         >> query_classifier
         >> classifier_branch
-    )
-    # chat database branch
-    (
-        classifier_branch
-        >> chat_data_task
-        >> llm_task
-        >> sql_parse_task
-        >> sql_chart_task
-        >> join_task
     )
     # chat indicator branch
     (

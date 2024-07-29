@@ -27,11 +27,7 @@ class FinTableProcessor:
                 data = eval(line)
                 print(data)
                 # ignore页眉 and 页脚
-                if (
-                    data
-                    and data["type"] not in ["页眉", "页脚"]
-                    and data["inside"] != ""
-                ):
+                if data and data["type"] not in ["页眉", "页脚"] and data["inside"] != "":
                     self.all_data.append(data)
 
     def process_text_data(self):
@@ -256,9 +252,7 @@ class FinTableProcessor:
             except Exception:
                 # match column contains year, month, date.
                 logger.error(
-                    "Error: 文件<{}>中的表格<{}>有误，拆分处理".format(
-                        self.txt_path, table_name
-                    )
+                    "Error: 文件<{}>中的表格<{}>有误，拆分处理".format(self.txt_path, table_name)
                 )
                 pattern = r"\d{4}年\d{1,2}月\d{1,2}日"
                 # Iterate through the column names of the first row
@@ -341,7 +335,6 @@ class FinTableExtractor:
             "",
         )
         with open(self.file_name, "r", encoding="utf-8") as file:
-
             lines = file.readlines()
             for i in range(len(lines)):
                 line = lines[i]
@@ -455,10 +448,7 @@ class FinTableExtractor:
                         )
                         english_name2 = check_answers(
                             english_name2,
-                            "'公司的外文名称缩写|公司的外文名称缩写(?:（如有）)？"
-                            ""
-                            ""
-                            "'",
+                            "'公司的外文名称缩写|公司的外文名称缩写(?:（如有）)？" "" "" "'",
                             True,
                         )
                         web = check_answers(
@@ -466,9 +456,7 @@ class FinTableExtractor:
                             "'公司(?:国际互联网)?网址|公司(?:国际互联网)?网址'",
                             True,
                         )
-                        boss = check_answers(
-                            boss, "'公司的法定代表人|公司的法定代表人'", False
-                        )
+                        boss = check_answers(boss, "'公司的法定代表人|公司的法定代表人'", False)
                         all_person = check_answers(
                             all_person,
                             "'(?:报告期末)?在职员工的数量合计(?:（人）)?|(?:报告期末)?在职员工"
@@ -823,7 +811,6 @@ class FinTableExtractor:
             answer_dict[_l] = ""
 
         with open(self.file_name, "r", encoding="utf-8") as file:
-
             lines = file.readlines()
             for line in lines:
                 line = line.replace("\n", "")
@@ -877,9 +864,7 @@ class FinTableExtractor:
                         line_dict,
                         text5,
                     )
-                    if re.search(
-                        "(?:负责人.{0,15}|6、)(?:母公司现金流量表)$", all_text
-                    ):
+                    if re.search("(?:负责人.{0,15}|6、)(?:母公司现金流量表)$", all_text):
                         break
 
                 except Exception:
@@ -954,13 +939,9 @@ class FinTableExtractor:
                                 print(key)
                 return answer_dict
 
-            answer_dict = check_data(
-                answer_dict, text1[cut1_len:], "12月31日", "合并资产负债表"
-            )
+            answer_dict = check_data(answer_dict, text1[cut1_len:], "12月31日", "合并资产负债表")
             answer_dict = check_data(answer_dict, text3[cut3_len:], "度", "合并利润表")
-            answer_dict = check_data(
-                answer_dict, text5[cut5_len:], "度", "合并现金流量表"
-            )
+            answer_dict = check_data(answer_dict, text5[cut5_len:], "度", "合并现金流量表")
             new_row = {
                 "文件名": allname,
                 "日期": date,
@@ -1051,7 +1032,6 @@ class FinTableExtractor:
             check_cut27,
         ) = (False, False, False, False, False, False, False)
         with open(self.file_name, "r", encoding="utf-8") as file:
-
             lines = file.readlines()
             for i in range(len(lines)):
                 line = lines[i]
@@ -1080,11 +1060,7 @@ class FinTableExtractor:
                                 or len(answer) >= 2000
                                 or len(re.findall("是.否", answer)) >= 2
                                 or len(re.findall("适用.不适用", answer)) >= 2
-                                or len(
-                                    re.findall(
-                                        "第(?:一|二|三|四|五|六|七|八|九|十)节", answer
-                                    )
-                                )
+                                or len(re.findall("第(?:一|二|三|四|五|六|七|八|九|十)节", answer))
                                 >= 2
                             ):
                                 check_cut = False
@@ -1113,11 +1089,7 @@ class FinTableExtractor:
                             elif (
                                 re.search(keywords_stop_re, line_dict["inside"])
                                 or len(answer) >= 2000
-                                or len(
-                                    re.findall(
-                                        "第(?:一|二|三|四|五|六|七|八|九|十)节", answer
-                                    )
-                                )
+                                or len(re.findall("第(?:一|二|三|四|五|六|七|八|九|十)节", answer))
                                 >= 2
                             ):
                                 check_cut = False
@@ -1252,8 +1224,7 @@ class FinTableExtractor:
                         cut25, check_cut25 = check_answers(
                             cut25,
                             "对会计师事务所本报告期“非标准审计报告”的说明",
-                            "董事会对该事项的意见|独立董事意见|监事会意见|消除有关事项及其影响的"
-                            "具体措施",
+                            "董事会对该事项的意见|独立董事意见|监事会意见|消除有关事项及其影响的" "具体措施",
                             check_cut25,
                         )
                         cut26, check_cut26 = check_answers(

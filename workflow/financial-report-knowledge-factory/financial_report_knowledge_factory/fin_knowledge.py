@@ -15,7 +15,7 @@ from dbgpt.rag.knowledge.base import (
     KnowledgeType,
 )
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 class FinReportKnowledge(Knowledge):

@@ -1,5 +1,6 @@
 """ChatKnowledgeOperator."""
 
+import os
 from typing import Optional
 
 from dbgpt._private.config import Config
@@ -8,15 +9,15 @@ from dbgpt.core import (
     HumanPromptTemplate,
     ModelMessage,
     ModelRequest,
-    SystemPromptTemplate,
 )
 from dbgpt.core.awel import MapOperator
+from dbgpt.datasource import RDBMSConnector
 from dbgpt.rag.embedding.embedding_factory import RerankEmbeddingFactory
 from dbgpt.rag.retriever.rerank import RerankEmbeddingsRanker
-from dbgpt.serve.rag.service.service import Service
-from dbgpt.storage.vector_store.filters import MetadataFilters, MetadataFilter
-from .intent import FinReportIntent
+from dbgpt.storage.vector_store.filters import MetadataFilter, MetadataFilters
 
+from .common import FinConfigMixin
+from .intent import FinReportIntent
 
 _DEFAULT_TEMPLATE_ZH = """你是专业的金融财报分析专家，基于以下给出的已知信息, 准守规范约束，专业、简要回答用户的金融问题.
 规范约束:
@@ -51,60 +52,61 @@ professional and concise answers to their questions.
 """
 
 
-class ChatKnowledgeOperator(MapOperator[ModelRequest, ModelRequest]):
+class ChatKnowledgeOperator(FinConfigMixin, MapOperator[ModelRequest, ModelRequest]):
     """ChatKnowledgeOperator."""
 
     def __init__(
         self,
         task_name="chat_knowledge",
         intent: Optional[FinReportIntent] = None,
-        **kwargs
+        **kwargs,
     ):
         """ChatKnowledgeOperator."""
         self._intent = intent
-        self._knowledge_space = kwargs.pop("knowledge_space", None)
         self._cfg = Config()
-        super().__init__(task_name=task_name, **kwargs)
+        MapOperator.__init__(self, task_name=task_name, **kwargs)
 
     async def map(self, input_value: ModelRequest) -> ModelRequest:
         """Map function for ChatKnowledgeOperator."""
-        from dbgpt.configs.model_config import EMBEDDING_MODEL_CONFIG
-        from dbgpt.rag.embedding.embedding_factory import EmbeddingFactory
-        from dbgpt.storage.vector_store.base import VectorStoreConfig
+        from dbgpt.rag.retriever.embedding import EmbeddingRetriever
+
+        (
+            db_name,
+            space_name,
+            tmp_dir_path,
+            embedding_model,
+        ) = await self._get_chat_config()
 
         user_input = input_value.messages[-1].content
         user_inputs = [user_input]
-        knowledge_name = self._knowledge_space or input_value.context.extra.get("space")
         intent: FinReportIntent = input_value.context.extra.get("intent")
-        hit_document_title, new_user_input, metadata_filter = self.get_fuzzy_match(
-            user_input, intent, knowledge_name
+
+        # Cached connection
+        db_conn: RDBMSConnector = await self.get_connector(
+            space_name, db_name, tmp_dir_path
+        )
+
+        (
+            hit_document_title,
+            new_user_input,
+            metadata_filter,
+        ) = await self.blocking_func_to_async(
+            self.get_fuzzy_match, user_input, intent, space_name, db_conn
         )
         if hit_document_title:
             user_inputs.append(new_user_input)
 
-        if not knowledge_name:
+        if not space_name:
             raise ValueError("Knowledge name is required.")
 
-        embedding_factory = self.system_app.get_component(
-            "embedding_factory", EmbeddingFactory
-        )
-        from dbgpt.rag.retriever.embedding import EmbeddingRetriever
-        from dbgpt.serve.rag.connector import VectorStoreConnector
-
-        embedding_fn = embedding_factory.create(
-            model_name=EMBEDDING_MODEL_CONFIG[self._cfg.EMBEDDING_MODEL]
+        index_store = await self.get_vector_store(
+            space_name, tmp_dir_path, embedding_model
         )
 
-        config = VectorStoreConfig(
-            name=knowledge_name,
-            embedding_fn=embedding_fn,
-        )
-        vector_store_connector = VectorStoreConnector(
-            vector_store_type=self._cfg.VECTOR_STORE_TYPE, vector_store_config=config
-        )
         reranker = None
         retriever_top_k = self._cfg.KNOWLEDGE_SEARCH_TOP_SIZE
-        if self._cfg.RERANK_MODEL:
+        if not self.dev_mode and self._cfg.RERANK_MODEL:
+            # Dev mode not support reranker
             rerank_embeddings = RerankEmbeddingFactory.get_instance(
                 self._cfg.SYSTEM_APP
             ).create()
@@ -115,9 +117,10 @@ class ChatKnowledgeOperator(MapOperator[ModelRequest, ModelRequest]):
                 # We use reranker, so if the top_k is less than 20,
                 # we need to set it to 20
                 retriever_top_k = max(self._cfg.RERANK_TOP_K, 20)
+
         embedding_retriever = EmbeddingRetriever(
             top_k=retriever_top_k,
-            index_store=vector_store_connector.client,
+            index_store=index_store,
             rerank=reranker,
         )
         chunks = []
@@ -158,17 +161,31 @@ class ChatKnowledgeOperator(MapOperator[ModelRequest, ModelRequest]):
         request.messages = model_messages
         return request
 
-    def get_fuzzy_match(self, user_input, intent, space):
+    def get_fuzzy_match(self, user_input, intent, space, db_conn: RDBMSConnector):
         """fuzzy match for user input and get label filter"""
-        knowledge_service = Service.get_instance(self._cfg.SYSTEM_APP)
-        document_list = knowledge_service.get_document_list(
-            {"space": space}, page=1, page_size=1000
-        )
-        document_titles = [document.doc_name for document in document_list.items]
-        if intent and intent.company and intent.company is not "":
+        if self.dev_mode:
+            company_df = db_conn.run_to_df(f"select 文件名 from fin_report")
+            document_titles = [
+                item[0] for item in company_df.values.tolist() if item is not None
+            ]
+        else:
+            from dbgpt.serve.rag.service.service import Service
+
+            knowledge_service = Service.get_instance(self._cfg.SYSTEM_APP)
+            document_list = knowledge_service.get_document_list(
+                {"space": space}, page=1, page_size=1000
+            )
+            document_titles = [document.doc_name for document in document_list.items]
+
+        # Keep file name, not full path
+        file_names = [
+            os.path.splitext(os.path.basename(path))[0] for path in document_titles
+        ]
+
+        if intent and intent.company and intent.company != "":
             from fuzzywuzzy import process
 
-            best_match, confidence = process.extractOne(intent.company, document_titles)
+            best_match, confidence = process.extractOne(intent.company, file_names)
             hit_title = best_match or intent.company
             user_input = intent.intent
             filter = MetadataFilter(key="title", value=hit_title.replace(".pdf", ""))

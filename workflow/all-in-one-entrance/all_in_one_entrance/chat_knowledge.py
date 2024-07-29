@@ -36,9 +36,9 @@ class ChatKnowledgeOperator(MapOperator[ModelRequest, ModelRequest]):
         super().__init__(task_name=task_name, **kwargs)
 
     async def map(self, input_value: ModelRequest) -> ModelRequest:
-        from dbgpt.rag.embedding.embedding_factory import EmbeddingFactory
         from dbgpt._private.config import Config
         from dbgpt.configs.model_config import EMBEDDING_MODEL_CONFIG
+        from dbgpt.rag.embedding.embedding_factory import EmbeddingFactory
         from dbgpt.storage.vector_store.base import VectorStoreConfig
 
         cfg = Config()
