@@ -10,7 +10,7 @@ from typing import Any, Dict, Optional, Tuple
 from dbgpt.agent import AgentMessage, ConversableAgent, ProfileConfig
 from dbgpt.core import ModelMessageRoleType
 
-from .action import SummaryAction, NOT_RELATED_MESSAGE
+from .action import NOT_RELATED_MESSAGE, SummaryAction
 
 CHECK_RESULT_SYSTEM_MESSAGE = (
     "You are an expert in analyzing the results of a summary task."
@@ -120,8 +120,8 @@ class MySummarizerAgent(ConversableAgent):
 
 async def _test_agent():
     """Test the summarizer agent."""
+    from dbgpt.agent import AgentContext, AgentMemory, LLMConfig, UserProxyAgent
     from dbgpt.model.proxy import OpenAILLMClient
-    from dbgpt.agent import AgentContext, AgentMemory, UserProxyAgent, LLMConfig
 
     llm_client = OpenAILLMClient(model_alias="gpt-3.5-turbo")
     context: AgentContext = AgentContext(conv_id="summarize")

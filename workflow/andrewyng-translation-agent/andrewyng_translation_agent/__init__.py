@@ -313,7 +313,6 @@ class MultiChunkReflectOnTranslationText:
 
 
 class TranslationMixinLLMOperator(MixinLLMOperator, ABC):
-
     _SOURCE_LANG_CACHE_KEY = "__translation_source_lang__"
     _TARGET_LANG_CACHE_KEY = "__translation_target_lang__"
     _MAX_TOKENS_CACHE_KEY = "__translation_max_tokens__"
@@ -325,8 +324,8 @@ class TranslationMixinLLMOperator(MixinLLMOperator, ABC):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        from dbgpt.util.cache_utils import cached
         from cachetools import TTLCache
+        from dbgpt.util.cache_utils import cached
 
         @cached(TTLCache(maxsize=100, ttl=60))
         async def count_tokens(text: str, model: Optional[str] = None) -> int:
@@ -538,7 +537,6 @@ class OneChunkInputTranslationOperator(
         task_name: str = "one_chunk_input_translation",
         **kwargs,
     ):
-
         TranslationMixinLLMOperator.__init__(self)
         MapOperator.__init__(self, task_name=task_name, **kwargs)
 
@@ -605,7 +603,6 @@ class OneChunkInitialTranslationOperator(
         llm_client: Optional[LLMClient] = None,
         **kwargs,
     ):
-
         TranslationMixinLLMOperator.__init__(self, default_client=llm_client)
         MapOperator.__init__(self, **kwargs)
         self.system_prompt = system_prompt
@@ -704,7 +701,6 @@ class OneChunkReflectOnTranslationOperator(
         llm_client: Optional[LLMClient] = None,
         **kwargs,
     ):
-
         TranslationMixinLLMOperator.__init__(self, default_client=llm_client)
         MapOperator.__init__(self, **kwargs)
         self.country = country
@@ -716,7 +712,6 @@ class OneChunkReflectOnTranslationOperator(
     async def map(
         self, prv: OneChunkInitialTranslationText
     ) -> OneChunkReflectOnTranslationText:
-
         reflection_text = await self.reflection(prv.translation_text, prv.source_text)
         return OneChunkReflectOnTranslationText(
             source_text=prv.source_text,
@@ -799,7 +794,6 @@ class OneChunkImproveTranslationOperator(
         llm_client: Optional[LLMClient] = None,
         **kwargs,
     ):
-
         TranslationMixinLLMOperator.__init__(self, default_client=llm_client)
         MapOperator.__init__(self, **kwargs)
         self.system_prompt = system_prompt
@@ -892,7 +886,6 @@ class MultiChunkInitialTranslationOperator(
         concurrency_limit: int = 5,
         **kwargs,
     ):
-
         TranslationMixinLLMOperator.__init__(self, default_client=llm_client)
         MapOperator.__init__(self, **kwargs)
         self.system_prompt = system_prompt
@@ -1139,7 +1132,6 @@ class MultiChunkImproveTranslationOperator(
         concurrency_limit: int = 5,
         **kwargs,
     ):
-
         TranslationMixinLLMOperator.__init__(self, default_client=llm_client)
         MapOperator.__init__(self, **kwargs)
         self.system_prompt = system_prompt
@@ -1356,7 +1348,6 @@ class TranslationBranchOperator(TranslationMixinLLMOperator, BranchOperator[str,
         BranchOperator.__init__(self, **kwargs)
 
     async def branches(self) -> Dict[BranchFunc[str], BranchTaskType]:
-
         async def check_less_max_tokens(source_text: str):
             # Read from cache
             max_tokens = await self.get_max_tokens()
@@ -1603,7 +1594,7 @@ async def _translate(
 
     Just for local testing purposes.
     """
-    from dbgpt.core.awel import InputSource, InputOperator
+    from dbgpt.core.awel import InputOperator, InputSource
     from dbgpt.model.proxy import OpenAILLMClient
 
     # please make sure to install tiktoken to count tokens
@@ -1742,7 +1733,6 @@ class TranslationRequestHandleOperator(
 
 
 with DAG("andrewyng_translation_agent_dag") as dag:
-
     concurrency_limit = int(os.getenv("ANDREWYNG_TRANSLATION_CONCURRENCY_LIMIT", 5))
 
     trigger = CommonLLMHttpTrigger(

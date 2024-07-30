@@ -61,7 +61,6 @@ _SHARE_DATA_DATABASE_NAME_KEY = "__database_name__"
 
 
 class ChatDatabaseOperator(MapOperator[ModelRequest, ModelRequest]):
-
     def __init__(self, task_name="chat_database", **kwargs):
         super().__init__(task_name=task_name, **kwargs)
 
@@ -128,7 +127,6 @@ class ChatDatabaseOperator(MapOperator[ModelRequest, ModelRequest]):
 
 
 class ChatDatabaseOutputParserOperator(SQLOutputParser):
-
     async def map(self, input_value: ModelOutput) -> dict:
         return self.parse_model_nostream_resp(input_value, "#########")
 

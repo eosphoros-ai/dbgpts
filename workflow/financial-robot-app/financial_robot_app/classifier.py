@@ -1,20 +1,18 @@
 """The Question Classifier Operator."""
 
+import os
 from concurrent.futures import Executor, ThreadPoolExecutor
 from enum import Enum
-from typing import Dict, Optional, List
-import os
-
-import joblib
-from dbgpt.util.executor_utils import blocking_func_to_async
-from tqdm import tqdm
-from transformers import AutoModel, AutoTokenizer
+from typing import Dict, List, Optional
 
 from dbgpt.core import ModelRequest
 from dbgpt.core.awel import BranchFunc, BranchOperator, BranchTaskType, MapOperator
 from dbgpt.core.awel.flow import IOField, OperatorCategory, Parameter, ViewMetadata
-from dbgpt.core.awel.task.base import IN, OUT
+from dbgpt.util.executor_utils import blocking_func_to_async
 from dbgpt.util.i18n_utils import _
+from transformers import AutoModel, AutoTokenizer
+
+from .common import FinConfigMixin
 
 
 class FinQuestionClassifierType(Enum):
@@ -34,7 +32,9 @@ class FinQuestionClassifierType(Enum):
         raise ValueError(f"{value} is not a valid value for {cls.__name__}")
 
 
-class QuestionClassifierOperator(MapOperator[IN, OUT]):
+class QuestionClassifierOperator(
+    FinConfigMixin, MapOperator[ModelRequest, ModelRequest]
+):
     """The Question Classifier Operator."""
 
     metadata = ViewMetadata(
@@ -73,17 +73,14 @@ class QuestionClassifierOperator(MapOperator[IN, OUT]):
 
     def __init__(
         self,
-        model: str = None,
-        adapter_model_path: str = None,
+        model: Optional[str] = None,
+        adapter_model_path: Optional[str] = None,
         device: Optional[str] = None,
         executor: Optional[Executor] = None,
         **kwargs,
     ):
         """Create a new Question Classifier Operator."""
-        if not model:
-            raise ValueError("model must be provided")
         if not adapter_model_path:
-
             current_dir = os.path.dirname(os.path.abspath(__file__))
             adapter_model_path = os.path.join(
                 current_dir, "models", "dbgpt-hub-nlu-v0.1"
@@ -101,7 +98,7 @@ class QuestionClassifierOperator(MapOperator[IN, OUT]):
         self._device = device
         self._batch_size = 4
         self._executor = executor or ThreadPoolExecutor()
-        super().__init__(**kwargs)
+        MapOperator.__init__(self, **kwargs)
 
     async def map(self, request: ModelRequest) -> ModelRequest:
         """Map the user question to a financial."""
@@ -130,6 +127,10 @@ class QuestionClassifierOperator(MapOperator[IN, OUT]):
 
     async def _init_models(self):
         if not self._pretrained_model:
+            _, _, _, embedding_model = await self._get_chat_config()
+            self._model = embedding_model or self._model
+            if not self._model:
+                raise ValueError("Embedding model must be provided")
             self._pretrained_model = await blocking_func_to_async(
                 self._executor, AutoModel.from_pretrained, self._model
             )

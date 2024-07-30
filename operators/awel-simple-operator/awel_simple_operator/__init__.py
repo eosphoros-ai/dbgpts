@@ -1,7 +1,7 @@
 """awel-simple-operator operator package"""
 
 from dbgpt.core.awel import MapOperator
-from dbgpt.core.awel.flow import ViewMetadata, OperatorCategory, IOField, Parameter
+from dbgpt.core.awel.flow import IOField, OperatorCategory, Parameter, ViewMetadata
 
 
 class SimpleHelloWorldOperator(MapOperator[str, str]):

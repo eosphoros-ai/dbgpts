@@ -3,13 +3,13 @@
 import logging
 from typing import Optional
 
-from dbgpt.core.awel import MapOperator
-from openai._compat import parse_obj
-from pydantic import BaseModel, Field
-
 from dbgpt.core import LLMClient, ModelRequest
+from dbgpt.core.awel import MapOperator
+from dbgpt.model.operators import MixinLLMOperator
 from dbgpt.rag.transformer.llm_extractor import LLMExtractor
 from dbgpt.util.json_utils import find_json_objects
+from openai._compat import parse_obj
+from pydantic import BaseModel, Field
 
 FIN_INTENT_EXTRACT_PROMPT_TEMPLATE = """你是一个金融领域专家，你需要根据用户问题，提取问题中存在的公司名称，年份，以及意图信息\n"
     "以下是一个问题示例：
@@ -57,18 +57,20 @@ class FinIntentExtractor(LLMExtractor):
         return parse_obj(FinReportIntent, json_result)
 
 
-class FinIntentExtractorOperator(MapOperator[ModelRequest, ModelRequest]):
+class FinIntentExtractorOperator(
+    MixinLLMOperator, MapOperator[ModelRequest, ModelRequest]
+):
     """FinIntentExtractorOperator class."""
 
-    def __init__(self, llm_client: LLMClient, **kwargs):
+    def __init__(self, default_client: Optional[LLMClient] = None, **kwargs):
         """Initialize the FinIntentExtractorOperator."""
-        self._llm_client = llm_client
-        super().__init__(**kwargs)
+        MixinLLMOperator.__init__(self, default_client=default_client)
+        MapOperator.__init__(self, **kwargs)
 
     async def map(self, request: ModelRequest) -> ModelRequest:
         """Map the data."""
         model_name = request.model
-        extractor = FinIntentExtractor(self._llm_client, model_name)
+        extractor = FinIntentExtractor(self.llm_client, model_name)
         fin_intent = await extractor.extract(request.messages[-1].content)
         request.context.extra["intent"] = fin_intent
         return request
