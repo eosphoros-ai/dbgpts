@@ -1,0 +1,15 @@
+[flow]
+label = "Db expert assisant flow"
+# A unique name for all dbgpts
+name = "db_expert_assisant"
+version = "0.1.0"
+description = "An ai assisant expert for db"
+authors = ["Henry Yang <yhjun1026@gmail.com>"]
+# How to define the flow, python or json
+definition_type = "json"
+
+[python_config]
+
+# Json config
+[json_config]
+file_path = "definition/flow_definition.json"
