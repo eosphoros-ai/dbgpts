@@ -1,4 +1,4 @@
-# A ai agent flow for db expert assiant
+# For the process of the database expert AI assistant, please replace the resource and application with your local information according to the document to get a DBA assistant application. Refer to the document to expand more content.
 
 ## Installation
 
