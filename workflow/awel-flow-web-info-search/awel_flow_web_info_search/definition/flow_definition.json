@@ -2,11 +2,11 @@
   "nodes": [
     {
       "width": 288,
-      "height": 116,
+      "height": 115,
       "id": "operator_agent_trigger___$$___agent___$$___v1_0",
       "position": {
-        "x": 200.0,
-        "y": -85.0,
+        "x": -10.694406328607727,
+        "y": -38.92793521497376,
         "zoom": 0.0
       },
       "type": "customNode",
@@ -39,18 +39,18 @@
         "type_cls": "dbgpt.agent.core.plan.awel.agent_operator.AgentDummyTrigger"
       },
       "position_absolute": {
-        "x": 200.0,
-        "y": -85.0,
+        "x": -10.694406328607727,
+        "y": -38.92793521497376,
         "zoom": 0.0
       }
     },
     {
       "width": 288,
-      "height": 259,
+      "height": 258,
       "id": "operator_agent_operator___$$___agent___$$___v1_0",
       "position": {
-        "x": 610.5,
-        "y": -94.5,
+        "x": 310.01907062204486,
+        "y": 19.939467967927776,
         "zoom": 0.0
       },
       "type": "customNode",
@@ -79,7 +79,8 @@
             "placeholder": null,
             "description": "The dbgpt agent.",
             "options": null,
-            "value": "resource_dbgpt.agent.core.plan.awel.agent_operator_resource.AWELAgent_0"
+            "value": "resource_dbgpt.agent.core.plan.awel.agent_operator_resource.AWELAgent_0",
+            "alias": null
           }
         ],
         "operator_type": "map",
@@ -108,18 +109,18 @@
         "type_cls": "dbgpt.agent.core.plan.awel.agent_operator.AWELAgentOperator"
       },
       "position_absolute": {
-        "x": 610.5,
-        "y": -94.5,
+        "x": 310.01907062204486,
+        "y": 19.939467967927776,
         "zoom": 0.0
       }
     },
     {
       "width": 288,
-      "height": 429,
+      "height": 464,
       "id": "resource_dbgpt.agent.core.plan.awel.agent_operator_resource.AWELAgent_0",
       "position": {
-        "x": 144.06962903829032,
-        "y": 130.5874859096009,
+        "x": -12.193071865813181,
+        "y": 87.52660366207206,
         "zoom": 0.0
       },
       "type": "customNode",
@@ -151,9 +152,14 @@
             "description": "Which agent want use.",
             "options": [
               {
-                "label": "HelloWorldSpeaker",
-                "name": "HelloWorldSpeaker",
-                "value": "HelloWorldSpeaker"
+                "label": "AppLauncher",
+                "name": "AppLauncher",
+                "value": "AppLauncher"
+              },
+              {
+                "label": "Intent Recognition Expert",
+                "name": "Intent Recognition Expert",
+                "value": "Intent Recognition Expert"
               },
               {
                 "label": "CodeEngineer",
@@ -179,9 +185,20 @@
                 "label": "ToolExpert",
                 "name": "ToolExpert",
                 "value": "ToolExpert"
+              },
+              {
+                "label": "Indicator",
+                "name": "Indicator",
+                "value": "Indicator"
+              },
+              {
+                "label": "AI Assistant",
+                "name": "AI Assistant",
+                "value": "AI Assistant"
               }
             ],
-            "value": "ToolExpert"
+            "value": "ToolExpert",
+            "alias": null
           },
           {
             "type_name": "str",
@@ -196,7 +213,8 @@
             "placeholder": null,
             "description": "The agent role name.",
             "options": null,
-            "value": null
+            "value": null,
+            "alias": null
           },
           {
             "type_name": "str",
@@ -211,11 +229,12 @@
             "placeholder": null,
             "description": "The agent fixed gogal.",
             "options": null,
-            "value": null
+            "value": null,
+            "alias": null
           },
           {
-            "type_name": "AWELAgentResource",
-            "type_cls": "dbgpt.agent.core.plan.awel.agent_operator_resource.AWELAgentResource",
+            "type_name": "AgentResource",
+            "type_cls": "dbgpt.agent.resource.base.AgentResource",
             "label": "Agent Resource",
             "name": "agent_resource",
             "is_list": false,
@@ -226,7 +245,8 @@
             "placeholder": null,
             "description": "The agent resource.",
             "options": null,
-            "value": "resource_dbgpt.agent.core.plan.awel.agent_operator_resource.AWELAgentResource_0"
+            "value": "resource_dbgpt.agent.core.plan.awel.agent_operator_resource.AWELAgentResource_0",
+            "alias": null
           },
           {
             "type_name": "AWELAgentConfig",
@@ -241,7 +261,24 @@
             "placeholder": null,
             "description": "The agent llm config.",
             "options": null,
-            "value": null
+            "value": null,
+            "alias": null
+          },
+          {
+            "type_name": "AgentPrompt",
+            "type_cls": "dbgpt.agent.core.plan.awel.agent_operator_resource.AgentPrompt",
+            "label": "Agent Prompt",
+            "name": "agent_prompt",
+            "is_list": false,
+            "category": "resource",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The agent prompt.",
+            "options": null,
+            "value": null,
+            "alias": null
           }
         ],
         "resource_type": "instance",
@@ -251,18 +288,18 @@
         ]
       },
       "position_absolute": {
-        "x": 144.06962903829032,
-        "y": 130.5874859096009,
+        "x": -12.193071865813181,
+        "y": 87.52660366207206,
         "zoom": 0.0
       }
     },
     {
       "width": 288,
-      "height": 352,
+      "height": 349,
       "id": "resource_dbgpt.agent.core.plan.awel.agent_operator_resource.AWELAgentResource_0",
       "position": {
-        "x": -388.63838539711907,
-        "y": 199.519548818312,
+        "x": -338.00930976906176,
+        "y": 208.00675300093945,
         "zoom": 0.0
       },
       "type": "customNode",
@@ -314,7 +351,8 @@
                 "value": "tool"
               }
             ],
-            "value": "tool"
+            "value": "tool",
+            "alias": null
           },
           {
             "type_name": "str",
@@ -329,7 +367,8 @@
             "placeholder": null,
             "description": "The agent resource name.",
             "options": null,
-            "value": "baidu_search"
+            "value": "123",
+            "alias": null
           },
           {
             "type_name": "str",
@@ -344,7 +383,8 @@
             "placeholder": null,
             "description": "The agent resource value.",
             "options": null,
-            "value": "baidu_search"
+            "value": "baidu_search",
+            "alias": null
           }
         ],
         "resource_type": "instance",
@@ -355,18 +395,18 @@
         ]
       },
       "position_absolute": {
-        "x": -388.63838539711907,
-        "y": 199.519548818312,
+        "x": -338.00930976906176,
+        "y": 208.00675300093945,
         "zoom": 0.0
       }
     },
     {
       "width": 288,
-      "height": 259,
+      "height": 258,
       "id": "operator_agent_operator___$$___agent___$$___v1_1",
       "position": {
-        "x": 1032.3025816783086,
-        "y": -11.329755973525636,
+        "x": 710.4104097414612,
+        "y": 20.96473574990911,
         "zoom": 0.0
       },
       "type": "customNode",
@@ -395,7 +435,8 @@
             "placeholder": null,
             "description": "The dbgpt agent.",
             "options": null,
-            "value": "resource_dbgpt.agent.core.plan.awel.agent_operator_resource.AWELAgent_1"
+            "value": "resource_dbgpt.agent.core.plan.awel.agent_operator_resource.AWELAgent_1",
+            "alias": null
           }
         ],
         "operator_type": "map",
@@ -424,18 +465,18 @@
         "type_cls": "dbgpt.agent.core.plan.awel.agent_operator.AWELAgentOperator"
       },
       "position_absolute": {
-        "x": 1032.3025816783086,
-        "y": -11.329755973525636,
+        "x": 710.4104097414612,
+        "y": 20.96473574990911,
         "zoom": 0.0
       }
     },
     {
       "width": 288,
-      "height": 429,
+      "height": 464,
       "id": "resource_dbgpt.agent.core.plan.awel.agent_operator_resource.AWELAgent_1",
       "position": {
-        "x": 581.7922658497858,
-        "y": 538.7119087008334,
+        "x": 308.53708332583943,
+        "y": 295.2592299836971,
         "zoom": 0.0
       },
       "type": "customNode",
@@ -467,9 +508,14 @@
             "description": "Which agent want use.",
             "options": [
               {
-                "label": "HelloWorldSpeaker",
-                "name": "HelloWorldSpeaker",
-                "value": "HelloWorldSpeaker"
+                "label": "AppLauncher",
+                "name": "AppLauncher",
+                "value": "AppLauncher"
+              },
+              {
+                "label": "Intent Recognition Expert",
+                "name": "Intent Recognition Expert",
+                "value": "Intent Recognition Expert"
               },
               {
                 "label": "CodeEngineer",
@@ -495,9 +541,20 @@
                 "label": "ToolExpert",
                 "name": "ToolExpert",
                 "value": "ToolExpert"
+              },
+              {
+                "label": "Indicator",
+                "name": "Indicator",
+                "value": "Indicator"
+              },
+              {
+                "label": "AI Assistant",
+                "name": "AI Assistant",
+                "value": "AI Assistant"
               }
             ],
-            "value": "Summarizer"
+            "value": "Summarizer",
+            "alias": null
           },
           {
             "type_name": "str",
@@ -512,7 +569,8 @@
             "placeholder": null,
             "description": "The agent role name.",
             "options": null,
-            "value": null
+            "value": null,
+            "alias": null
           },
           {
             "type_name": "str",
@@ -527,11 +585,12 @@
             "placeholder": null,
             "description": "The agent fixed gogal.",
             "options": null,
-            "value": null
+            "value": null,
+            "alias": null
           },
           {
-            "type_name": "AWELAgentResource",
-            "type_cls": "dbgpt.agent.core.plan.awel.agent_operator_resource.AWELAgentResource",
+            "type_name": "AgentResource",
+            "type_cls": "dbgpt.agent.resource.base.AgentResource",
             "label": "Agent Resource",
             "name": "agent_resource",
             "is_list": false,
@@ -542,7 +601,8 @@
             "placeholder": null,
             "description": "The agent resource.",
             "options": null,
-            "value": null
+            "value": null,
+            "alias": null
           },
           {
             "type_name": "AWELAgentConfig",
@@ -557,7 +617,24 @@
             "placeholder": null,
             "description": "The agent llm config.",
             "options": null,
-            "value": null
+            "value": null,
+            "alias": null
+          },
+          {
+            "type_name": "AgentPrompt",
+            "type_cls": "dbgpt.agent.core.plan.awel.agent_operator_resource.AgentPrompt",
+            "label": "Agent Prompt",
+            "name": "agent_prompt",
+            "is_list": false,
+            "category": "resource",
+            "resource_type": "instance",
+            "optional": true,
+            "default": null,
+            "placeholder": null,
+            "description": "The agent prompt.",
+            "options": null,
+            "value": null,
+            "alias": null
           }
         ],
         "resource_type": "instance",
@@ -567,23 +644,13 @@
         ]
       },
       "position_absolute": {
-        "x": 581.7922658497858,
-        "y": 538.7119087008334,
+        "x": 308.53708332583943,
+        "y": 295.2592299836971,
         "zoom": 0.0
       }
     }
   ],
   "edges": [
-    {
-      "source": "resource_dbgpt.agent.core.plan.awel.agent_operator_resource.AWELAgent_0",
-      "source_order": 0,
-      "target": "operator_agent_operator___$$___agent___$$___v1_0",
-      "target_order": 0,
-      "id": "resource_dbgpt.agent.core.plan.awel.agent_operator_resource.AWELAgent_0|operator_agent_operator___$$___agent___$$___v1_0",
-      "source_handle": "resource_dbgpt.agent.core.plan.awel.agent_operator_resource.AWELAgent_0|outputs|0",
-      "target_handle": "operator_agent_operator___$$___agent___$$___v1_0|parameters|0",
-      "type": "buttonedge"
-    },
     {
       "source": "operator_agent_trigger___$$___agent___$$___v1_0",
       "source_order": 0,
@@ -592,6 +659,16 @@
       "id": "operator_agent_trigger___$$___agent___$$___v1_0|operator_agent_operator___$$___agent___$$___v1_0",
       "source_handle": "operator_agent_trigger___$$___agent___$$___v1_0|outputs|0",
       "target_handle": "operator_agent_operator___$$___agent___$$___v1_0|inputs|0",
+      "type": "buttonedge"
+    },
+    {
+      "source": "resource_dbgpt.agent.core.plan.awel.agent_operator_resource.AWELAgent_0",
+      "source_order": 0,
+      "target": "operator_agent_operator___$$___agent___$$___v1_0",
+      "target_order": 0,
+      "id": "resource_dbgpt.agent.core.plan.awel.agent_operator_resource.AWELAgent_0|operator_agent_operator___$$___agent___$$___v1_0",
+      "source_handle": "resource_dbgpt.agent.core.plan.awel.agent_operator_resource.AWELAgent_0|outputs|0",
+      "target_handle": "operator_agent_operator___$$___agent___$$___v1_0|parameters|0",
       "type": "buttonedge"
     },
     {
@@ -626,8 +703,8 @@
     }
   ],
   "viewport": {
-    "x": 654.4724685913234,
-    "y": 160.1890900560481,
-    "zoom": 1.0852140361871354
+    "x": 50.66887419670957,
+    "y": 186.1684913948913,
+    "zoom": 0.9928501688797082
   }
 }
