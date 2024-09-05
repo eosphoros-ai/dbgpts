@@ -43,10 +43,10 @@ class SimpleIntentClassifier(nn.Module):
 
     @classmethod
     def from_pretrained(cls, model_path, map_location=None):
-        with open(f"{model_path}/config.json", "r") as f:
+        with open(f"{model_path}/config.json", "r", encoding='utf-8') as f:
             config = json.load(f)
 
-        with open(f"{model_path}/tokenizer_config.json", "r") as f:
+        with open(f"{model_path}/tokenizer_config.json", "r", encoding='utf-8') as f:
             tokenizer_config = json.load(f)
 
         model = cls(config["input_dim"], config["hidden_size"])
