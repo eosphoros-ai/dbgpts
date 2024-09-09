@@ -22,7 +22,7 @@ class FinTableProcessor:
 
     def read_file(self):
         """Read file and store data in self.all_data."""
-        with open(self.txt_path, "r") as file:
+        with open(self.txt_path, "r", encoding='utf-8') as file:
             for line in file:
                 data = eval(line)
                 print(data)
