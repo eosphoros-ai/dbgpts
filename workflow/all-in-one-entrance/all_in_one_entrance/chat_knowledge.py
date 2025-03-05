@@ -40,6 +40,7 @@ class ChatKnowledgeOperator(MapOperator[ModelRequest, ModelRequest]):
         from dbgpt.configs.model_config import EMBEDDING_MODEL_CONFIG
         from dbgpt.rag.embedding.embedding_factory import EmbeddingFactory
         from dbgpt.storage.vector_store.base import VectorStoreConfig
+        from dbgpt_serve.rag.connector import VectorStoreConnector
 
         cfg = Config()
 
@@ -53,11 +54,8 @@ class ChatKnowledgeOperator(MapOperator[ModelRequest, ModelRequest]):
             "embedding_factory", EmbeddingFactory
         )
         from dbgpt.rag.retriever.embedding import EmbeddingRetriever
-        from dbgpt.serve.rag.connector import VectorStoreConnector
 
-        embedding_fn = embedding_factory.create(
-            model_name=EMBEDDING_MODEL_CONFIG[cfg.EMBEDDING_MODEL]
-        )
+        embedding_fn = embedding_factory.create()
 
         config = VectorStoreConfig(
             name=knowledge_name,

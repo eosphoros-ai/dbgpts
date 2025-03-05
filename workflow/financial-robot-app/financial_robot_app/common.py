@@ -34,13 +34,9 @@ class FinConfigMixin(BaseOperator, ABC):
             return embeddings
 
         if not self.dev_mode:
-            from dbgpt.configs.model_config import EMBEDDING_MODEL_CONFIG
 
-            cfg = Config()
             embedding_factory = EmbeddingFactory.get_instance(self.system_app)
-            embeddings = embedding_factory.create(
-                model_name=EMBEDDING_MODEL_CONFIG[cfg.EMBEDDING_MODEL]
-            )
+            embeddings = embedding_factory.create()
         else:
             from dbgpt.rag.embedding import DefaultEmbeddingFactory
 

@@ -1,14 +1,22 @@
-[tool.poetry]
+[project]
 name = "financial-report-knowledge-factory"
 version = "0.1.0"
 description = "A pipline to process financial report knowledge"
-authors = ["Aries <916701291@qq.com>"]
+authors = [
+    { name = "aries_ckt", email = "916701291@qq.com" }
+]
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.8"
-
+requires-python = ">=3.10"
+dependencies = []
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "dbgpt",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["financial_report_knowledge_factory"]

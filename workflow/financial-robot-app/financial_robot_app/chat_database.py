@@ -40,7 +40,7 @@ class ChatDatabaseOutputParserOperator(SQLOutputParser):
 
     async def map(self, input_value: ModelOutput) -> dict:
         """Map the input value to the output value."""
-        return self.parse_model_nostream_resp(input_value, "#########")
+        return self.parse_model_nostream_resp(input_value)
 
 
 class ChatDatabaseChartOperator(FinConfigMixin, MapOperator[dict, str]):

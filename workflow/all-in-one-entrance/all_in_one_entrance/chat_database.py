@@ -66,8 +66,8 @@ class ChatDatabaseOperator(MapOperator[ModelRequest, ModelRequest]):
 
     async def map(self, input_value: ModelRequest) -> ModelRequest:
         from dbgpt._private.config import Config
-        from dbgpt.rag.summary.db_summary_client import DBSummaryClient
         from dbgpt.vis.tags.vis_chart import default_chart_type_prompt
+        from dbgpt_serve.datasource.service.db_summary_client import DBSummaryClient
 
         cfg = Config()
 
@@ -128,7 +128,7 @@ class ChatDatabaseOperator(MapOperator[ModelRequest, ModelRequest]):
 
 class ChatDatabaseOutputParserOperator(SQLOutputParser):
     async def map(self, input_value: ModelOutput) -> dict:
-        return self.parse_model_nostream_resp(input_value, "#########")
+        return self.parse_model_nostream_resp(input_value)
 
 
 class ChatDatabaseChartOperator(MapOperator[dict, str]):
@@ -137,7 +137,7 @@ class ChatDatabaseChartOperator(MapOperator[dict, str]):
 
     async def map(self, input_value: dict) -> str:
         from dbgpt._private.config import Config
-        from dbgpt.datasource import RDBMSConnector
+        from dbgpt.datasource.rdbms.base import RDBMSConnector
         from dbgpt.vis.tags.vis_chart import VisChart
 
         db_name = await self.current_dag_context.get_from_share_data(
@@ -147,6 +147,9 @@ class ChatDatabaseChartOperator(MapOperator[dict, str]):
         cfg = Config()
         database: RDBMSConnector = cfg.local_db_manager.get_connector(db_name)
         sql = input_value.get("sql")
+        thoughts = input_value.get("thoughts")
+        if not sql:
+            return thoughts
         data_df = await self.blocking_func_to_async(database.run_to_df, sql)
         view = await vis.display(chart=input_value, data_df=data_df)
-        return view
+        return thoughts + "\n" + view

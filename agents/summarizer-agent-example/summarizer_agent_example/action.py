@@ -16,8 +16,8 @@ class SummaryActionInput(BaseModel):
 
 
 class SummaryAction(Action[SummaryActionInput]):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     @property
     def resource_need(self) -> Optional[ResourceType]:

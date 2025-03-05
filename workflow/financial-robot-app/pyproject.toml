@@ -1,17 +1,26 @@
-[tool.poetry]
+[project]
 name = "financial-robot-app"
 version = "0.1.0"
 description = "Financial Report chat robot"
-authors = ["Aries <916701291@qq.com>"]
+authors = [
+    { name = "aries_ckt", email = "916701291@qq.com" }
+]
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.8"
-
-[tool.poetry.group.dev.dependencies]
-
-financial-report-knowledge-factory = {path = "../financial-report-knowledge-factory", develop = true}
+requires-python = ">=3.10"
+dependencies = []
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "dbgpt",
+    "financial-report-knowledge-factory"
+]
+
+[tool.uv.sources]
+financial-report-knowledge-factory= { path = "../financial-report-knowledge-factory"}
+
+[tool.hatch.build.targets.wheel]
+packages = ["financial_robot_app"]

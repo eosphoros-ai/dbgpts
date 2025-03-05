@@ -1,14 +1,22 @@
-[tool.poetry]
+[project]
 name = "jina-web-reader"
 version = "0.1.0"
 description = "Convert any URL to an LLM-friendly input with a simple prefix https://r.jina.ai/"
-authors = ["Fangyin Cheng <staneyffer@gmail.com>"]
+authors = [
+    { name = "Fangyin Cheng", email = "staneyffer@gmail.com" }
+]
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.8"
-
+requires-python = ">=3.10"
+dependencies = []
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "dbgpt[agent]",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["jina_web_reader"]

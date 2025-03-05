@@ -5,9 +5,9 @@ An implementation of `Write Your Custom Agent
 """
 
 import asyncio
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple, List
 
-from dbgpt.agent import AgentMessage, ConversableAgent, ProfileConfig
+from dbgpt.agent import AgentMessage, ConversableAgent, ProfileConfig, Agent
 from dbgpt.core import ModelMessageRoleType
 
 from .action import NOT_RELATED_MESSAGE, SummaryAction
@@ -63,13 +63,23 @@ class MySummarizerAgent(ConversableAgent):
         super().__init__(**kwargs)
         self._init_actions([SummaryAction])
 
-    def _init_reply_message(self, received_message: AgentMessage) -> AgentMessage:
-        reply_message = super()._init_reply_message(received_message)
+    def _init_reply_message(self, 
+        received_message: AgentMessage,
+        rely_messages: Optional[List[AgentMessage]] = None,
+    ) -> AgentMessage:
+        reply_message = super()._init_reply_message(received_message, rely_messages)
         # Fill in the dynamic parameters in the prompt template
         reply_message.context = {"not_related_message": NOT_RELATED_MESSAGE}
         return reply_message
 
-    def prepare_act_param(self) -> Dict[str, Any]:
+    def prepare_act_param(
+        self,
+        received_message: Optional[AgentMessage],
+        sender: Agent,
+        rely_messages: Optional[List[AgentMessage]] = None,
+        **kwargs,
+    ) -> Dict[str, Any]:
+
         return {"action_extra_param_key": "this is extra param"}
 
     async def correctness_check(
@@ -79,7 +89,7 @@ class MySummarizerAgent(ConversableAgent):
         action_report = message.action_report
         task_result = ""
         if action_report:
-            task_result = action_report.get("content", "")
+            task_result = action_report.content
 
         check_result, model = await self.thinking(
             messages=[

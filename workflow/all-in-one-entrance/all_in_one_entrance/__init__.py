@@ -239,6 +239,7 @@ class ChatNormalOperator(MapOperator[ModelRequest, ModelRequest]):
 
 class EndOperator(BaseLLM, MapOperator[ModelRequest, str]):
     def __init__(self, task_name="end", **kwargs):
+        BaseLLM.__init__(self)
         MapOperator.__init__(self, task_name=task_name, **kwargs)
 
     async def map(self, input_value: ModelRequest) -> str:

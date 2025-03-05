@@ -1,17 +1,22 @@
-[tool.poetry]
+[project]
 name = "awel-flow-web-info-search"
 version = "0.1.0"
 description = "A simple ai info search flow."
-authors = ["Henry Yang <yhjun1026@gmail.com>"]
+authors = [
+    { name = "Henry Yang ", email = "yhjun1026@gmail.com" }
+]
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.10"
-
+requires-python = ">=3.10"
+dependencies = []
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
+[tool.uv]
+dev-dependencies = [
+    "dbgpt",
+]
 
-
+[tool.hatch.build.targets.wheel]
+packages = ["awel_flow_web_info_search"]

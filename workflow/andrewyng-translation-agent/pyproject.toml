@@ -1,14 +1,22 @@
-[tool.poetry]
+[project]
 name = "andrewyng-translation-agent"
 version = "0.1.0"
 description = "Implementation of Andrewyng Translation Agent: https://github.com/andrewyng/translation-agent"
-authors = ["Fangyin Cheng <staneyffer@gmail.com>"]
+authors = [
+    { name = "Fangyin Cheng", email = "staneyffer@gmail.com" }
+]
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.10"
-
+requires-python = ">=3.10"
+dependencies = []
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "dbgpt",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["andrewyng_translation_agent"]

@@ -1,14 +1,22 @@
-[tool.poetry]
+[project]
 name = "summarizer-agent-example"
 version = "0.1.2"
 description = ""
-authors = ["Fangyin Cheng <staneyffer@gmail.com>"]
+authors = [
+    { name = "Fangyin Cheng", email = "staneyffer@gmail.com" }
+]
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.10"
-dbgpt = {extras = ["agent"], version = "^0.5.6rc1"}
+requires-python = ">=3.10"
+dependencies = []
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "dbgpt[agent]",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["summarizer_agent_example"]
